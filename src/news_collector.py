@@ -9,30 +9,59 @@ import json
 class SmartNewsCollector:
     def __init__(self):
         self.feeds = [
-            "https://www.rigzone.com/news/rss/rigzone_latest.aspx",
-            "https://www.worldoil.com/rss",
-            "https://www.oilandgas360.com/feed/",
-            "https://www.upstreamonline.com/rss",
-            "https://www.oilprice.com/rss/main",
-            "https://www.spglobal.com/commodityinsights/en/rss-feed/oil",
-            "https://www.reuters.com/markets/commodities/rss"
+            # Verified working sources
+            "https://www.rigzone.com/news/rss/rigzone_latest.aspx",  # Rigzone - WORKING
+            "https://www.oilprice.com/rss/main",  # Oil Price - WORKING
+            "https://www.worldoil.com/rss",  # World Oil
+            "https://www.oilandgas360.com/feed/",  # Oil and Gas 360
+            
+            # Major financial/energy sources
+            "https://feeds.finance.yahoo.com/rss/2.0/headline?s=XOM,CVX,COP,EOG,SLB&region=US&lang=en-US",  # Yahoo Finance Energy
+            "https://feeds.bloomberg.com/energy.rss",  # Bloomberg Energy
+            "https://www.marketwatch.com/rss/energy",  # MarketWatch Energy
+            
+            # Government and industry sources
+            "https://www.eia.gov/rss/press_releases.xml",  # US Energy Information Admin
+            "https://www.api.org/news-policy-and-issues/news/feed.xml",  # American Petroleum Institute
+            
+            # Alternative verified energy sources
+            "https://oilchange.org/feed/",  # Oil Change International
+            "https://energynow.com/feed/",  # Energy Now
+            "https://www.naturalgasintel.com/feed/",  # Natural Gas Intelligence
+            "https://www.energypost.eu/feed/",  # Energy Post
+            "https://www.jwnenergy.com/feed/",  # JWN Energy
+            
+            # Regional energy sources
+            "https://www.spglobal.com/platts/en/rss-feed/oil",  # S&P Global Platts
+            "https://www.argusmedia.com/en/news/energy-feed",  # Argus Media
+            
+            # Backup sources (may not all work, but worth trying)
+            "https://feeds.reuters.com/reuters/businessNews",  # Reuters Business
+            "https://www.cnbc.com/id/10000698/device/rss/rss.html",  # CNBC Oil
+            "https://rss.cnn.com/rss/money_news_energy.rss",  # CNN Energy
         ]
         
         # Weighted keywords for relevance scoring
         self.keywords = {
             'critical': {
-                'words': ['drilling', 'extraction', 'production', 'discovery', 
-                         'oil rig', 'fracking', 'offshore', 'onshore', 'barrel'],
+                'words': ['drilling', 'extraction', 'production', 'discovery', 'oil rig', 
+                         'fracking', 'offshore', 'onshore', 'barrel', 'completion', 
+                         'horizontal drilling', 'subsea', 'unconventional', 'tight oil'],
                 'weight': 3
             },
             'important': {
-                'words': ['OPEC', 'crude', 'pipeline', 'refinery', 'exploration',
-                         'reserves', 'shale', 'deepwater', 'upstream'],
+                'words': ['OPEC', 'crude', 'pipeline', 'refinery', 'exploration', 'reserves', 
+                         'shale', 'deepwater', 'upstream', 'downstream', 'midstream', 'LNG',
+                         'natural gas', 'gas processing', 'Permian', 'Bakken', 'Eagle Ford',
+                         'wellhead', 'flowback', 'hydraulic fracturing'],
                 'weight': 2
             },
             'relevant': {
-                'words': ['energy', 'petroleum', 'fossil', 'oil price', 'oil market',
-                         'oil company', 'drilling technology', 'oil field'],
+                'words': ['energy', 'petroleum', 'fossil', 'oil price', 'oil market', 
+                         'oil company', 'drilling technology', 'oil field', 'E&P', 
+                         'exploration production', 'oilfield services', 'rig count',
+                         'drilling permits', 'oil inventory', 'crude stocks', 'API',
+                         'WTI', 'Brent', 'energy sector', 'petrochemical'],
                 'weight': 1
             }
         }
@@ -66,7 +95,21 @@ class SmartNewsCollector:
         
         for feed_url in self.feeds:
             try:
+                # Add timeout and user agent to avoid being blocked
+                import socket
+                socket.setdefaulttimeout(10)  # 10 second timeout
+                
+                # Set user agent to avoid blocking
+                feedparser.USER_AGENT = "Oil Podcast Generator/1.0 (+https://github.com/shariqbaig/oil-podcast-generator)"
+                
+                print(f"Fetching from: {feed_url}")
                 feed = feedparser.parse(feed_url)
+                
+                if not feed.entries:
+                    print(f"  No entries found")
+                    continue
+                    
+                print(f"  Found {len(feed.entries)} entries")
                 for entry in feed.entries[:10]:  # Get more initially for better filtering
                     # De-duplicate by title
                     title_hash = entry.title.lower().strip()
@@ -106,7 +149,7 @@ class SmartNewsCollector:
         # Sort by score and return top articles
         all_articles.sort(key=lambda x: x['score'], reverse=True)
         
-        # Ensure diversity - no more than 2 from same source
+        # Ensure diversity - no more than 2 from same source, get more articles
         final_articles = []
         source_count = {}
         for article in all_articles:
@@ -114,7 +157,7 @@ class SmartNewsCollector:
             if source_count.get(source, 0) < 2:
                 final_articles.append(article)
                 source_count[source] = source_count.get(source, 0) + 1
-                if len(final_articles) >= 7:
+                if len(final_articles) >= 10:  # Increased from 7 to 10 for more content
                     break
         
         return final_articles
