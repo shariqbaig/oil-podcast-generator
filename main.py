@@ -121,7 +121,7 @@ def generate_html_index():
                                     <h3>${title}</h3>
                                     <p>${new Date(date).toLocaleDateString()}</p>
                                     <audio controls>
-                                        <source src="${url.replace(window.location.origin + '/', '')}" type="audio/mpeg">
+                                        <source src="${url}" type="audio/mpeg">
                                     </audio>
                                 </div>
                             `;
