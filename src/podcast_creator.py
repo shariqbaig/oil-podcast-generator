@@ -5,36 +5,38 @@ import asyncio
 import random
 from pydub import AudioSegment
 import edge_tts
+from src.music_generator import BackgroundMusicGenerator
 
 class MultiVoicePodcastCreator:
     def __init__(self, max_retries=3, base_delay=2):
         self.max_retries = max_retries
         self.base_delay = base_delay
+        self.music_generator = BackgroundMusicGenerator()
         
-        # Soothing, conversational voices
+        # Soothing, conversational voices with more natural pace
         self.voices = {
             'host1': {
                 'name': 'en-US-GuyNeural',  # Warm, friendly male voice
-                'rate': '-10%',  # Slower, more relaxed pace
-                'pitch': '-5Hz'  # Lower pitch for calming effect
+                'rate': '+0%',  # Natural pace (not too slow)
+                'pitch': '-3Hz'  # Slightly lower pitch for warmth
             },
             'host2': {
                 'name': 'en-US-AriaNeural',  # Gentle, conversational female voice
-                'rate': '-8%',  # Slower, thoughtful pace
-                'pitch': '-3Hz'  # Slightly lower for warmth
+                'rate': '+2%',  # Slightly faster for energy
+                'pitch': '-2Hz'  # Slightly lower for warmth
             }
         }
         
-        # Emotion to prosody mapping (more subtle for soothing effect)
+        # Emotion to prosody mapping (natural variations, not too slow)
         self.emotion_settings = {
-            'neutral': {'rate': '-10%', 'pitch': '-5Hz'},
-            'excited': {'rate': '-5%', 'pitch': '-2Hz'},  # Toned down excitement
-            'thoughtful': {'rate': '-15%', 'pitch': '-7Hz'},  # Even more relaxed
-            'concerned': {'rate': '-12%', 'pitch': '-6Hz'},
-            'optimistic': {'rate': '-8%', 'pitch': '-3Hz'},  # Gentle optimism
-            'amused': {'rate': '-7%', 'pitch': '-1Hz'},  # Light, playful tone
-            'surprised': {'rate': '-6%', 'pitch': '+1Hz'},  # Slight pitch up for surprise
-            'skeptical': {'rate': '-12%', 'pitch': '-8Hz'}  # Slower, lower for doubt
+            'neutral': {'rate': '+0%', 'pitch': '-2Hz'},
+            'excited': {'rate': '+5%', 'pitch': '+2Hz'},  # Natural excitement
+            'thoughtful': {'rate': '-5%', 'pitch': '-3Hz'},  # Slightly slower
+            'concerned': {'rate': '-3%', 'pitch': '-4Hz'},
+            'optimistic': {'rate': '+3%', 'pitch': '+1Hz'},  # Upbeat
+            'amused': {'rate': '+2%', 'pitch': '+1Hz'},  # Light, playful
+            'surprised': {'rate': '+4%', 'pitch': '+3Hz'},  # Natural surprise
+            'skeptical': {'rate': '-4%', 'pitch': '-5Hz'}  # Slightly slower
         }
     
     async def create_podcast(self, dialogue_script, output_file):
@@ -68,13 +70,13 @@ class MultiVoicePodcastCreator:
                         # Load and process audio
                         audio = AudioSegment.from_file(tmp_filename, format="mp3")
                         
-                        # Add longer, more natural pauses for relaxed conversation
+                        # Add minimal pauses for fluent conversation
                         if i > 0 and dialogue_script[i-1]['speaker'] != segment['speaker']:
-                            silence = AudioSegment.silent(duration=800)  # Longer pause between speakers
+                            silence = AudioSegment.silent(duration=300)  # Brief pause between speakers
                             audio_segments.append(silence)
                         elif i > 0:
-                            # Comfortable pause between same speaker
-                            silence = AudioSegment.silent(duration=400)
+                            # Very short pause for same speaker
+                            silence = AudioSegment.silent(duration=100)
                             audio_segments.append(silence)
                         
                         audio_segments.append(audio)
@@ -97,9 +99,22 @@ class MultiVoicePodcastCreator:
             outro_silence = AudioSegment.silent(duration=1500)
             final_with_padding = intro_silence + final_audio + outro_silence
             
+            # Add background music
+            print("Adding subtle background music...")
+            try:
+                # Generate ambient music for the full duration
+                music_duration = len(final_with_padding)
+                background_music = self.music_generator.create_ambient_music(music_duration)
+                
+                # Mix with speech
+                final_with_music = self.music_generator.mix_with_speech(final_with_padding, background_music)
+            except Exception as e:
+                print(f"Could not add background music: {e}")
+                final_with_music = final_with_padding
+            
             # Normalize and export
             print(f"Exporting to {output_file}")
-            final_normalized = final_with_padding.normalize()
+            final_normalized = final_with_music.normalize()
             
             # Higher quality export
             final_normalized.export(
@@ -226,21 +241,24 @@ class MultiVoicePodcastCreator:
         return text
     
     def _process_reactions(self, text):
-        """Convert reaction markers to speakable text or sounds"""
+        """Convert reaction markers to more subtle expressions"""
         import re
         
-        # Common reactions and their spoken equivalents
+        # More subtle, natural reactions
         reactions = {
-            '[laughs]': 'ha ha ha',
-            '[chuckles]': 'heh heh',
-            '[sighs]': 'ahh',
+            '[laughs]': '',  # Remove explicit laughs, let emotion handle it
+            '[chuckles]': '',  # Remove explicit chuckles
+            '[sighs]': '',  # Remove sighs
             '[surprised]': '',  # Remove marker, emotion handles it
             '[upbeat]': '',  # Remove marker, emotion handles it
             '[amused]': '',  # Remove marker, emotion handles it
-            'Hmm...': 'Hmmm,',
-            'Oh wow!': 'Oh wow',
-            'Actually, wait—': 'Actually, wait,',
-            'Oh, that reminds me—': 'Oh, that reminds me,',
+            'Hmm...': 'Hmm,',  # Shorter thinking sound
+            'Oh wow!': 'Wow',  # More subtle
+            'Actually, wait—': 'Actually,',  # Smoother
+            'Oh, that reminds me—': 'That reminds me,',  # Less abrupt
+            'ha ha': '',  # Remove any explicit ha ha
+            'haha': '',  # Remove variations
+            'Ha ha': '',  # Remove variations
         }
         
         for marker, replacement in reactions.items():

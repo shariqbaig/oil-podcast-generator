@@ -9,3 +9,4 @@ edge-tts==7.2.3                     # Updated to fix 403 error
 google-generativeai==0.8.3         # For Gemini AI
 python-dotenv==1.0.0                # For environment variables
 aiofiles==24.1.0                    # For async file operations
+numpy>=1.24.3                       # For audio processing and music generation

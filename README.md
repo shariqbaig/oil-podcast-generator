@@ -18,12 +18,13 @@ Experience AI-generated discussions between two hosts with natural conversation 
 - **Natural Conversation Flow**: Context-aware dialogue with emotional variations
 
 ### 🎙️ Advanced Audio Production
-- **Microsoft Edge TTS Neural Voices**: High-quality, soothing voices optimized for relaxed listening
+- **Microsoft Edge TTS Neural Voices**: High-quality, natural voices with emotion support
   - Male host: GuyNeural (warm, friendly tone)
   - Female host: AriaNeural (gentle, conversational style)
+- **Ambient Background Music**: Subtle, auto-generated music with intelligent ducking
 - **Smart URL Processing**: Converts URLs to speakable domain names
 - **Industry Term Pronunciation**: Proper handling of oil & gas terminology (OPEC, WTI, LNG, etc.)
-- **Dynamic Pacing**: Adjustable speech rates and natural pauses for comfortable listening
+- **Optimized Pacing**: Natural speech flow with minimal gaps for fluent conversation
 
 ### 📰 Comprehensive News Coverage
 - **20+ RSS Feed Sources**: Including Rigzone, OilPrice.com, Bloomberg Energy, EIA
@@ -132,7 +133,14 @@ gh workflow run generate_podcast.yml
 
 ## 🎯 Recent Improvements
 
-### v2.1 (Latest)
+### v2.2 (Latest)
+- ✅ Added subtle ambient background music generation
+- ✅ Improved speech fluency with reduced pauses
+- ✅ Removed excessive laugh sounds for more natural conversation
+- ✅ Optimized voice speeds for better flow
+- ✅ Enhanced audio mixing with music ducking
+
+### v2.1
 - ✅ Extended episodes to 15 minutes with deeper discussions
 - ✅ Added natural laughs, reactions, and conversational elements
 - ✅ Implemented 8 new emotion states (amused, surprised, skeptical)
