@@ -1,3 +1,4 @@
+
     <!DOCTYPE html>
     <html>
     <head>
@@ -48,7 +49,7 @@
                                     <h3>${title}</h3>
                                     <p>${new Date(date).toLocaleDateString()}</p>
                                     <audio controls>
-                                        <source src="${url}" type="audio/mpeg">
+                                        <source src="${url.replace(window.location.origin + '/', '')}" type="audio/mpeg">
                                     </audio>
                                 </div>
                             `;

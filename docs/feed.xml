@@ -12,7 +12,7 @@
     <itunes:type>episodic</itunes:type>
     <itunes:owner>
       <itunes:name>Oil Field Insights</itunes:name>
-      <itunes:email>noreply@github.com</itunes:email>
+      <itunes:email>noreply@example.com</itunes:email>
     </itunes:owner>
     <itunes:category text="Business">
       <itunes:category text="Investing" />
@@ -25,8 +25,8 @@
       <description>Daily oil and gas industry news for September 10, 2025. AI-generated podcast featuring two hosts discussing the latest developments, market trends, and industry insights.</description>
       <guid isPermaLink="false">oil_podcast_20250910</guid>
       <pubDate>Wed, 10 Sep 2025 00:00:00 +0000</pubDate>
-      <enclosure url="https://shariqbaig.github.io/oil-podcast-generator/episodes/oil_news_20250910.mp3" type="audio/mpeg" length="9017931" />
-      <itunes:duration>9:10</itunes:duration>
+      <enclosure url="https://shariqbaig.github.io/oil-podcast-generator/episodes/oil_news_20250910.mp3" type="audio/mpeg" length="3588641" />
+      <itunes:duration>3:39</itunes:duration>
       <itunes:explicit>no</itunes:explicit>
       <itunes:keywords>oil, gas, energy, industry, news, AI, podcast, drilling, OPEC, crude</itunes:keywords>
     </item>
