@@ -126,7 +126,7 @@ def generate_html_index():
     """
     
     with open('docs/index.html', 'w', encoding='utf-8') as f:
-        f.write(html_content.replace('YOUR-USERNAME', os.environ.get('GITHUB_REPOSITORY_OWNER', 'YOUR-USERNAME')))
+        f.write(html_content.replace('YOUR-USERNAME', os.environ.get('GITHUB_REPOSITORY_OWNER', 'shariqbaig')))
 
 if __name__ == "__main__":
     asyncio.run(generate_daily_podcast())
