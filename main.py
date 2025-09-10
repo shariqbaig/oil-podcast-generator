@@ -66,7 +66,6 @@ async def generate_daily_podcast():
     print("\n" + "=" * 60)
     print(f"[SUCCESS] PODCAST GENERATED SUCCESSFULLY!")
     print(f"[FILE] {output_file}")
-    print(f"[URL] https://shariqbaig.github.io/oil-podcast-generator/")
     print("=" * 60)
 
 def generate_html_index():
@@ -92,19 +91,8 @@ def generate_html_index():
         
         <div class="subscribe-section">
             <h2>Subscribe to Podcast</h2>
-            <p>Copy this RSS feed URL to your podcast app:</p>
-            <input type="text" value="https://shariqbaig.github.io/oil-podcast-generator/feed.xml" readonly style="width: 100%; padding: 10px;">
-            
-            <h3>Direct Links:</h3>
-            <a href="https://podcasts.apple.com/feed?url=https://shariqbaig.github.io/oil-podcast-generator/feed.xml">
-                <button>Apple Podcasts</button>
-            </a>
-            <a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9zaGFyaXFiYWlnLmdpdGh1Yi5pby9vaWwtcG9kY2FzdC1nZW5lcmF0b3IvZmVlZC54bWw=">
-                <button>Google Podcasts</button>
-            </a>
-            <a href="https://open.spotify.com/show/submit?feed=https://shariqbaig.github.io/oil-podcast-generator/feed.xml">
-                <button>Submit to Spotify</button>
-            </a>
+            <p>Copy the RSS feed URL (feed.xml) to your podcast app to subscribe.</p>
+            <p>This podcast is available as an RSS feed that can be added to any podcast player.</p>
         </div>
         
         <h2>Recent Episodes</h2>
@@ -133,7 +121,7 @@ def generate_html_index():
                                     <h3>${title}</h3>
                                     <p>${new Date(date).toLocaleDateString()}</p>
                                     <audio controls>
-                                        <source src="${url.replace('https://shariqbaig.github.io/oil-podcast-generator/', '')}" type="audio/mpeg">
+                                        <source src="${url.replace(window.location.origin + '/', '')}" type="audio/mpeg">
                                     </audio>
                                 </div>
                             `;

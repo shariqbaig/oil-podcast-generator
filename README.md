@@ -2,12 +2,9 @@
 
 An intelligent podcast generation system that creates daily, soothing conversations about the oil and gas industry using advanced AI and neural text-to-speech technology.
 
-## 🎧 Listen Now
+## 🎧 About
 
-**Latest Episode**: [Oil News Podcast](https://shariqbaig.github.io/oil-podcast-generator/)  
-**RSS Feed**: [Subscribe in your podcast app](https://shariqbaig.github.io/oil-podcast-generator/feed.xml)
-
-Experience AI-generated discussions between two hosts with natural conversation flow, industry insights, and market analysis.
+Experience AI-generated discussions between two hosts with natural conversation flow, industry insights, and market analysis. The podcast is distributed via RSS feed and can be hosted on any web server or podcast platform.
 
 ## ✨ Key Features
 
@@ -73,6 +70,10 @@ python main.py
 
 ### Environment Variables
 - `GEMINI_API_KEY`: Google AI API key for enhanced script generation (get one [here](https://makersuite.google.com/app/apikey))
+- `PODCAST_BASE_URL`: (Optional) Base URL for RSS feed generation
+  - For GitHub Pages: `https://[username].github.io/[repository-name]`
+  - For custom hosting: `https://yourdomain.com/podcast`
+  - If not set, uses relative paths
 
 ### Voice Customization
 Edit `src/podcast_creator.py` to adjust:
@@ -198,12 +199,6 @@ Contributions welcome! Areas for improvement:
 ## 📜 License
 
 MIT License - See [LICENSE](LICENSE) file
-
-## 🔗 Links
-
-- **Live Podcast**: [https://shariqbaig.github.io/oil-podcast-generator/](https://shariqbaig.github.io/oil-podcast-generator/)
-- **RSS Feed**: [Subscribe](https://shariqbaig.github.io/oil-podcast-generator/feed.xml)
-- **GitHub**: [Source Code](https://github.com/shariqbaig/oil-podcast-generator)
 
 ---
 

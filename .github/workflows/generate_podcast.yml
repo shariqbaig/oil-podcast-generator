@@ -67,6 +67,7 @@ jobs:
           fi
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}  # ADD THIS SECRET IN GITHUB
+          PODCAST_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
           DEBUG_MODE: ${{ inputs.debug }}
           PYTHONUNBUFFERED: 1
       
@@ -154,5 +155,5 @@ jobs:
           echo "- **TTS Engine**: Edge TTS (Microsoft Neural Voices)" >> $GITHUB_STEP_SUMMARY
           echo "- **Status**: ✅ Success" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🎧 [Listen to Latest Episode](https://shariqbaig.github.io/oil-podcast-generator/)" >> $GITHUB_STEP_SUMMARY
-          echo "📡 [RSS Feed](https://shariqbaig.github.io/oil-podcast-generator/feed.xml)" >> $GITHUB_STEP_SUMMARY
+          echo "🎧 Podcast generated successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "📡 RSS feed updated" >> $GITHUB_STEP_SUMMARY
