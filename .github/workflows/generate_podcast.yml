@@ -3,8 +3,18 @@ name: Daily Oil Podcast Generator
 
 on:
   schedule:
-    - cron: '0 11 * * *'  # 11 AM UTC daily (6 AM EST)
-  workflow_dispatch:      # Manual trigger
+    # Run daily at 8:00 AM US Eastern Time
+    # During EST (Nov-Mar): 8 AM EST = 1 PM UTC (13:00)
+    # During EDT (Mar-Nov): 8 AM EDT = 12 PM UTC (12:00) 
+    # Using 12:00 UTC to split the difference for year-round consistency
+    - cron: '0 12 * * *'  # 12:00 PM UTC = 8:00 AM EDT / 7:00 AM EST
+  workflow_dispatch:      # Manual trigger button in GitHub Actions UI
+    inputs:
+      debug:
+        description: 'Enable debug output'
+        required: false
+        default: 'false'
+        type: boolean
 
 # Grant write permissions to GITHUB_TOKEN
 permissions:
@@ -37,9 +47,24 @@ jobs:
         run: |
           pip install -r requirements.txt
       
+      - name: Show timing information
+        run: |
+          echo "🕐 Workflow triggered at: $(date)"
+          echo "🌍 UTC time: $(date -u)"
+          echo "🇺🇸 US Eastern time: $(TZ='America/New_York' date)"
+          echo "🇺🇸 US Pacific time: $(TZ='America/Los_Angeles' date)"
+          
       - name: Generate podcast
         run: |
-          python main.py
+          echo "🎧 Starting podcast generation..."
+          if [ "${{ inputs.debug }}" == "true" ]; then
+            echo "🐛 Debug mode enabled"
+            python -u main.py  # Unbuffered output for real-time logs
+          else
+            python main.py
+          fi
+        env:
+          DEBUG_MODE: ${{ inputs.debug }}
       
       - name: Commit and push podcast
         run: |
@@ -96,3 +121,10 @@ jobs:
           else
             echo "Only $file_count episodes found, no cleanup needed"
           fi
+      
+      - name: Workflow completion
+        run: |
+          echo "✅ Podcast generation workflow completed successfully!"
+          echo "🎧 New episode should be available at: https://shariqbaig.github.io/oil-podcast-generator/"
+          echo "📡 RSS feed: https://shariqbaig.github.io/oil-podcast-generator/feed.xml"
+          echo "⏰ Completed at: $(date)"
