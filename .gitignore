@@ -47,8 +47,9 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
-# Podcast output files
+# Podcast output files (allow docs/episodes/*.mp3 for GitHub Pages)
 *.mp3
+!docs/episodes/*.mp3
 *.wav
 podcasts/
 output/

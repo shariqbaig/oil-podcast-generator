@@ -38,17 +38,33 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add docs/episodes/*.mp3
-          git add docs/feed.xml
-          git add docs/index.html
-          git diff --staged --quiet || git commit -m "Add podcast for $(date +'%Y-%m-%d')"
-          git push
+          
+          # Add files with force flag to override gitignore if needed
+          git add -f docs/episodes/*.mp3 || echo "No MP3 files to add"
+          git add docs/feed.xml || echo "No feed.xml changes"
+          git add docs/index.html || echo "No index.html changes"
+          
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🎧 Add podcast for $(date +'%Y-%m-%d') [automated]"
+            git push
+          fi
       
       - name: Keep only last 30 episodes
         run: |
           cd docs/episodes
-          ls -t *.mp3 | tail -n +31 | xargs -r rm
-          cd ../..
-          git add .
-          git diff --staged --quiet || git commit -m "Cleanup old episodes"
-          git push
+          # Count MP3 files
+          file_count=$(ls -1 *.mp3 2>/dev/null | wc -l)
+          
+          if [ "$file_count" -gt 30 ]; then
+            echo "Found $file_count episodes, keeping latest 30"
+            ls -t *.mp3 | tail -n +31 | xargs -r rm
+            cd ../..
+            git add docs/episodes/
+            git commit -m "🗑️ Cleanup old episodes (keep latest 30) [automated]"
+            git push
+          else
+            echo "Only $file_count episodes found, no cleanup needed"
+          fi
