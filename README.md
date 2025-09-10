@@ -6,6 +6,26 @@ An intelligent podcast generation system that creates daily, soothing conversati
 
 Experience AI-generated discussions between two hosts with natural conversation flow, industry insights, and market analysis. The podcast is distributed via RSS feed and can be hosted on any web server or podcast platform.
 
+## 🔄 Process Flow
+
+```mermaid
+graph TD
+    A[🕐 Daily Trigger/Manual Run] --> B[📰 News Collection]
+    B --> C{🔍 Filter Articles}
+    C -->|Relevant| D[🤖 AI Script Generation]
+    C -->|Not Relevant| B
+    D --> E[🎙️ Text-to-Speech]
+    E --> F[🎵 Add Background Music]
+    F --> G[🎧 Export MP3]
+    G --> H[📡 Update RSS Feed]
+    H --> I[🌐 Update Web Interface]
+    I --> J[✅ Podcast Published]
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style J fill:#9f9,stroke:#333,stroke-width:2px
+    style D fill:#bbf,stroke:#333,stroke-width:2px
+```
+
 ## ✨ Key Features
 
 ### 🤖 AI-Powered Intelligence
@@ -32,7 +52,7 @@ Experience AI-generated discussions between two hosts with natural conversation 
 ### 🚀 Production Pipeline
 - **Fully Automated**: End-to-end generation from news collection to audio publishing
 - **Robust Error Handling**: Retry logic with exponential backoff for network issues
-- **Audio Optimization**: FFmpeg processing for streaming-ready MP3s (192kbps)
+- **Audio Optimization**: FFmpeg processing for streaming-ready MP3s
 - **Episode Management**: Automatic cleanup keeps last 30 episodes
 
 ## 📦 Installation
@@ -104,19 +124,57 @@ oil-podcast-generator/
 ├── requirements.txt             # Python dependencies
 ├── .env.example                 # Environment variable template
 ├── src/
+│   ├── __init__.py             # Package initialization
 │   ├── news_collector.py       # RSS feed aggregation and filtering
 │   ├── script_generator.py     # AI dialogue generation (Gemini)
 │   ├── podcast_creator.py      # Edge TTS audio synthesis
+│   ├── music_generator.py      # Background music generation
 │   └── rss_generator.py        # Podcast RSS feed creation
 ├── docs/
 │   ├── episodes/               # Generated MP3 files
 │   ├── feed.xml               # Podcast RSS feed
-│   └── index.html             # Web player interface
+│   ├── index.html             # Web player interface
+│   └── README.md              # Documentation for web hosting
 ├── tests/
 │   └── test_tts.py            # TTS testing utilities
 └── .github/
     └── workflows/
         └── generate_podcast.yml # Daily automation (GitHub Actions)
+```
+
+## 🎛️ Technical Architecture
+
+### Component Interaction
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         main.py                              │
+│                    (Orchestration Layer)                     │
+└──────────┬────────────────────────────────────┬─────────────┘
+           │                                    │
+           ▼                                    ▼
+┌──────────────────────┐              ┌──────────────────────┐
+│  news_collector.py   │              │  script_generator.py │
+│  - Fetch RSS feeds   │              │  - Gemini AI prompts │
+│  - Score relevance   │◄─────────────│  - Dialogue creation │
+│  - Filter articles   │   Articles   │  - Emotion mapping   │
+└──────────────────────┘              └──────────────────────┘
+           │                                    │
+           │                                    ▼
+           │                          ┌──────────────────────┐
+           │                          │ podcast_creator.py   │
+           │                          │  - Edge TTS voices   │
+           │                          │  - Audio processing  │
+           │                          │  - Music mixing      │
+           └──────────────────────────└──────────┬───────────┘
+                                                │
+                      ┌─────────────────────────┼───────────┐
+                      ▼                         ▼           ▼
+           ┌──────────────────┐     ┌──────────────┐  ┌────────────┐
+           │music_generator.py│     │rss_generator │  │  Output    │
+           │ - Ambient sound  │     │ - XML feed   │  │ - MP3 file │
+           │ - Audio ducking  │     │ - Episodes   │  │ - RSS feed │
+           └──────────────────┘     └──────────────┘  └────────────┘
 ```
 
 ## 🔄 Automated Daily Generation
@@ -134,7 +192,13 @@ gh workflow run generate_podcast.yml
 
 ## 🎯 Recent Improvements
 
-### v2.2 (Latest)
+### v2.3 (Latest)
+- ✅ Removed all hardcoded URLs for portability
+- ✅ Made RSS generator configurable via environment
+- ✅ Added automatic URL detection in GitHub Actions
+- ✅ Enhanced documentation with flow diagrams
+
+### v2.2
 - ✅ Added subtle ambient background music generation
 - ✅ Improved speech fluency with reduced pauses
 - ✅ Removed excessive laugh sounds for more natural conversation
@@ -157,19 +221,15 @@ gh workflow run generate_podcast.yml
 - ✅ Improved pause timing for natural conversation
 - ✅ Added robust retry logic for API resilience
 
-### v1.0
-- Initial release with basic TTS
-- RSS feed aggregation
-- Simple script templates
-
 ## 📊 Technical Specifications
 
-- **Audio Format**: MP3, 192kbps, 44.1kHz
-- **Episode Length**: 10-15 minutes (extended conversations with laughs and reactions)
+- **Audio Format**: MP3, 192kbps, 44.1kHz (optimized to 128kbps in GitHub Actions)
+- **Episode Length**: 10-15 minutes (extended conversations)
 - **Voice Technology**: Microsoft Edge TTS Neural Voices
 - **AI Model**: Google Gemini 1.5 Flash
-- **Update Frequency**: Daily
+- **Update Frequency**: Daily (configurable)
 - **Storage**: Last 30 episodes retained
+- **Background Music**: Auto-generated ambient soundscape
 
 ## 🐛 Troubleshooting
 
@@ -188,6 +248,10 @@ gh workflow run generate_podcast.yml
 - Adjust voice settings in `podcast_creator.py`
 - Check FFmpeg installation
 
+**Background music issues**:
+- Ensure numpy is installed: `pip install numpy`
+- Check pydub installation
+
 ## 🤝 Contributing
 
 Contributions welcome! Areas for improvement:
@@ -195,6 +259,8 @@ Contributions welcome! Areas for improvement:
 - Voice variety options
 - Language support
 - Interactive features
+- Better music generation
+- Analytics integration
 
 ## 📜 License
 

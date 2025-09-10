@@ -1,28 +1,172 @@
-# Oil Field Insights Daily Podcast
+# 📻 Oil Field Insights Daily - Web Interface
 
 This directory contains the generated podcast files and web interface for the Oil Field Insights Daily podcast.
 
-## Files
+## 📁 Directory Structure
 
-- `index.html` - Main web interface for listening to episodes
-- `feed.xml` - RSS feed for podcast aggregators
-- `episodes/` - Directory containing MP3 audio files
-
-## GitHub Pages
-
-This site is hosted on GitHub Pages at: https://shariqbaig.github.io/oil-podcast-generator/
-
-## Podcast Details
-
-- **Format**: MP3, 128kbps
-- **Frequency**: Daily (when run)
-- **Content**: AI-generated oil & gas industry news
-- **Hosts**: Two AI voices with different accents
-- **Generation**: Fully automated using Python and TTS
-
-## Subscribe
-
-Copy this RSS URL into your podcast app:
 ```
-https://shariqbaig.github.io/oil-podcast-generator/feed.xml
+docs/
+├── episodes/          # Generated MP3 podcast files
+│   └── oil_news_YYYYMMDD.mp3
+├── feed.xml          # RSS feed for podcast aggregators
+├── index.html        # Web player interface
+└── README.md         # This file
 ```
+
+## 🎙️ Podcast Specifications
+
+### Audio Format
+- **Format**: MP3 (MPEG-1 Audio Layer 3)
+- **Bitrate**: 192kbps (source), 128kbps (optimized for streaming)
+- **Sample Rate**: 44.1kHz
+- **Channels**: Mono
+- **Duration**: 10-15 minutes per episode
+- **File Size**: ~15-20MB per episode
+
+### Content Details
+- **Hosts**: Two AI-generated voices
+  - Male (GuyNeural): Warm, analytical tone
+  - Female (AriaNeural): Friendly, enthusiastic style
+- **Background**: Subtle ambient music with intelligent ducking
+- **Topics**: Oil & gas industry news, market analysis, technology updates
+- **Generation**: Fully automated using Google Gemini AI and Edge TTS
+
+## 🌐 Deployment Options
+
+### GitHub Pages (Default)
+```yaml
+# Automatically configured in GitHub Actions
+PODCAST_BASE_URL: https://[username].github.io/[repository-name]
+```
+
+### Custom Domain
+```yaml
+# Set in environment variables
+PODCAST_BASE_URL: https://yourdomain.com/podcast
+```
+
+### Local Development
+```yaml
+# Leave unset for relative paths
+PODCAST_BASE_URL: # not set
+```
+
+## 📡 RSS Feed Integration
+
+The `feed.xml` file is compatible with all major podcast platforms:
+
+### Subscribe URL Format
+```
+[YOUR_BASE_URL]/feed.xml
+```
+
+### Supported Platforms
+- Apple Podcasts
+- Spotify (via submission)
+- Google Podcasts
+- Overcast
+- Pocket Casts
+- Castro
+- Any RSS-compatible podcast app
+
+## 🎨 Web Player Features
+
+The `index.html` provides:
+- **Episode List**: Displays last 10 episodes
+- **Audio Player**: HTML5 audio controls for each episode
+- **RSS Link**: Easy subscription option
+- **Responsive Design**: Works on mobile and desktop
+- **Auto-refresh**: Loads latest episodes dynamically
+
+## 🔄 Update Schedule
+
+```mermaid
+graph LR
+    A[12:00 PM UTC] --> B[GitHub Action Triggers]
+    B --> C[Generate Podcast]
+    C --> D[Update feed.xml]
+    D --> E[Update index.html]
+    E --> F[Publish to Web]
+    
+    style A fill:#f96,stroke:#333,stroke-width:2px
+    style F fill:#6f9,stroke:#333,stroke-width:2px
+```
+
+## 📊 Episode Naming Convention
+
+```
+oil_news_YYYYMMDD.mp3
+```
+
+Example: `oil_news_20250910.mp3` for September 10, 2025
+
+## 🔧 Manual Deployment
+
+### To GitHub Pages
+1. Ensure GitHub Pages is enabled in repository settings
+2. Set source to `main` branch, `/docs` folder
+3. Podcasts will be available at configured URL
+
+### To Custom Server
+1. Copy entire `docs/` directory to web server
+2. Ensure MIME types are configured:
+   ```
+   .mp3  -> audio/mpeg
+   .xml  -> application/rss+xml
+   .html -> text/html
+   ```
+3. Set appropriate CORS headers if needed
+
+## 🎯 Episode Management
+
+- **Retention**: Last 30 episodes kept automatically
+- **Cleanup**: Older episodes deleted by GitHub Action
+- **Archival**: Consider external backup for long-term storage
+
+## 📈 Analytics
+
+To add analytics, modify `index.html` to include:
+- Google Analytics
+- Podcast analytics services
+- Download counters
+
+## 🔒 Security
+
+- No sensitive data in published files
+- API keys stored in GitHub Secrets
+- Public read-only access to episodes
+
+## 🐛 Common Issues
+
+### Feed Not Updating
+- Check GitHub Action logs
+- Verify `GEMINI_API_KEY` is set
+- Ensure repository has write permissions
+
+### Audio Not Playing
+- Verify MP3 files are present in `episodes/`
+- Check browser console for errors
+- Ensure correct MIME types
+
+### RSS Validation
+Test feed at: https://validator.w3.org/feed/
+
+## 📝 Metadata
+
+### RSS Feed Elements
+- **Title**: Oil Field Insights Daily
+- **Description**: AI-generated oil & gas industry podcast
+- **Language**: en-us
+- **Category**: Business > Investing
+- **Generator**: Oil Podcast Generator v2.3
+
+### Episode Metadata
+- **Title**: Oil Field Insights - [Date]
+- **Description**: Daily industry news and analysis
+- **Duration**: Automatically calculated
+- **GUID**: Unique per episode
+- **Publication Date**: Generation timestamp
+
+---
+
+*Generated by Oil Podcast Generator - Powered by Google Gemini AI and Microsoft Edge TTS*
