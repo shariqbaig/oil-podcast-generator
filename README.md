@@ -132,7 +132,14 @@ gh workflow run generate_podcast.yml
 
 ## 🎯 Recent Improvements
 
-### v2.0 (Latest)
+### v2.1 (Latest)
+- ✅ Extended episodes to 15 minutes with deeper discussions
+- ✅ Added natural laughs, reactions, and conversational elements
+- ✅ Implemented 8 new emotion states (amused, surprised, skeptical)
+- ✅ Enhanced Gemini prompts for more engaging dialogue
+- ✅ Fixed ffmpeg workflow issues
+
+### v2.0
 - ✅ Migrated from OpenAI to Google Gemini AI
 - ✅ Switched to Edge TTS for superior voice quality
 - ✅ Added soothing voice profiles for relaxed listening
@@ -149,7 +156,7 @@ gh workflow run generate_podcast.yml
 ## 📊 Technical Specifications
 
 - **Audio Format**: MP3, 192kbps, 44.1kHz
-- **Episode Length**: 4-5 minutes average
+- **Episode Length**: 10-15 minutes (extended conversations with laughs and reactions)
 - **Voice Technology**: Microsoft Edge TTS Neural Voices
 - **AI Model**: Google Gemini 1.5 Flash
 - **Update Frequency**: Daily

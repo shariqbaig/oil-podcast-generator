@@ -84,9 +84,10 @@ jobs:
           # Get file info
           du -h "$LATEST_FILE"
           
-          # Optimize for streaming (optional)
-          ffmpeg -i "$LATEST_FILE" -codec:a libmp3lame -b:a 128k -ar 44100 "${LATEST_FILE}.tmp" -y
-          mv "${LATEST_FILE}.tmp" "$LATEST_FILE"
+          # Optimize for streaming (fixed temp file extension)
+          TEMP_FILE="${LATEST_FILE%.mp3}_temp.mp3"
+          ffmpeg -i "$LATEST_FILE" -codec:a libmp3lame -b:a 128k -ar 44100 "$TEMP_FILE" -y
+          mv "$TEMP_FILE" "$LATEST_FILE"
           
           echo "📊 Optimized file size: $(du -h "$LATEST_FILE")"
       

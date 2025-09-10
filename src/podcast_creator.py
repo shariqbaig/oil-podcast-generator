@@ -31,7 +31,10 @@ class MultiVoicePodcastCreator:
             'excited': {'rate': '-5%', 'pitch': '-2Hz'},  # Toned down excitement
             'thoughtful': {'rate': '-15%', 'pitch': '-7Hz'},  # Even more relaxed
             'concerned': {'rate': '-12%', 'pitch': '-6Hz'},
-            'optimistic': {'rate': '-8%', 'pitch': '-3Hz'}  # Gentle optimism
+            'optimistic': {'rate': '-8%', 'pitch': '-3Hz'},  # Gentle optimism
+            'amused': {'rate': '-7%', 'pitch': '-1Hz'},  # Light, playful tone
+            'surprised': {'rate': '-6%', 'pitch': '+1Hz'},  # Slight pitch up for surprise
+            'skeptical': {'rate': '-12%', 'pitch': '-8Hz'}  # Slower, lower for doubt
         }
     
     async def create_podcast(self, dialogue_script, output_file):
@@ -189,6 +192,9 @@ class MultiVoicePodcastCreator:
         # Clean up URLs before processing
         text = self._clean_urls(text)
         
+        # Process laugh and reaction markers
+        text = self._process_reactions(text)
+        
         # Fix pronunciations for oil industry terms (without SSML tags)
         text = text.replace('WTI', 'W T I')
         text = text.replace('OPEC', 'O P E C')
@@ -198,16 +204,50 @@ class MultiVoicePodcastCreator:
         text = text.replace('LNG', 'L N G')
         text = text.replace('API', 'A P I')
         text = text.replace('EIA', 'E I A')
+        text = text.replace('CEO', 'C E O')
+        text = text.replace('IPO', 'I P O')
+        text = text.replace('M&A', 'M and A')
         
         # Clean up common abbreviations
         text = text.replace('vs.', 'versus')
         text = text.replace('etc.', 'etcetera')
         text = text.replace('i.e.', 'that is')
         text = text.replace('e.g.', 'for example')
+        text = text.replace('Q1', 'first quarter')
+        text = text.replace('Q2', 'second quarter')
+        text = text.replace('Q3', 'third quarter')
+        text = text.replace('Q4', 'fourth quarter')
         
         # Add natural pauses with commas instead of SSML
         text = text.replace('...', ', ')
         text = text.replace(' - ', ', ')
+        text = text.replace('—', ', ')
+        
+        return text
+    
+    def _process_reactions(self, text):
+        """Convert reaction markers to speakable text or sounds"""
+        import re
+        
+        # Common reactions and their spoken equivalents
+        reactions = {
+            '[laughs]': 'ha ha ha',
+            '[chuckles]': 'heh heh',
+            '[sighs]': 'ahh',
+            '[surprised]': '',  # Remove marker, emotion handles it
+            '[upbeat]': '',  # Remove marker, emotion handles it
+            '[amused]': '',  # Remove marker, emotion handles it
+            'Hmm...': 'Hmmm,',
+            'Oh wow!': 'Oh wow',
+            'Actually, wait—': 'Actually, wait,',
+            'Oh, that reminds me—': 'Oh, that reminds me,',
+        }
+        
+        for marker, replacement in reactions.items():
+            text = text.replace(marker, replacement)
+        
+        # Remove any remaining brackets
+        text = re.sub(r'\[.*?\]', '', text)
         
         return text
     

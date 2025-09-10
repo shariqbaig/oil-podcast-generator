@@ -39,23 +39,23 @@ class DialogueScriptGenerator:
     def _generate_ai_script(self, articles, market_data):
         """Generate NotebookLM-style script using Gemini"""
         
-        # Prepare articles summary
+        # Prepare articles summary - use more articles for longer podcast
         articles_text = ""
-        for i, article in enumerate(articles[:5], 1):
+        for i, article in enumerate(articles[:8], 1):  # Increased from 5 to 8 articles
             articles_text += f"""
             Article {i}:
             Title: {article['title']}
-            Summary: {article['summary'][:300]}
+            Summary: {article['summary'][:400]}  # More detail
             Source: {article['source']}
             ---"""
         
         # Create the prompt
         prompt = f"""
-        You are creating a podcast script for "Oil Field Insights Daily" - an engaging, NotebookLM-style podcast about the oil and gas industry.
+        You are creating a podcast script for "Oil Field Insights Daily" - an engaging, conversational podcast about the oil and gas industry.
         
-        Create a natural dialogue between two hosts:
-        - Alex: Analytical, asks insightful questions, connects dots between stories
-        - Sam: Enthusiastic, provides context, explains technical concepts simply
+        Create a natural, LONG dialogue between two hosts:
+        - Alex: Analytical, occasionally makes dry jokes, asks probing questions, connects stories to bigger trends
+        - Sam: Enthusiastic, sometimes laughs at Alex's observations, explains technical concepts with analogies, adds personal reactions
         
         Today's date: {datetime.now().strftime('%B %d, %Y')}
         
@@ -66,31 +66,57 @@ class DialogueScriptGenerator:
         News Articles:
         {articles_text}
         
-        Create a 4-5 minute podcast script with:
-        1. Engaging opening hook (reference the date and market mood)
-        2. Natural back-and-forth discussion of the top 3 stories
-        3. Use phrases like "That's fascinating!", "Right!", "Here's what's interesting..."
-        4. Connect stories to bigger industry trends
-        5. Each speaker should have 8-12 turns
-        6. End with a forward-looking insight
+        Create a 15-MINUTE podcast script (approximately 60-80 dialogue turns total) with:
         
-        IMPORTANT: Return ONLY a JSON array with this exact format, no markdown or extra text:
+        1. WARM OPENING (4-5 turns):
+           - Casual greeting with date/weather reference
+           - Light banter or industry joke
+           - Market overview with personal reaction
+        
+        2. DEEP DIVES (50-60 turns):
+           - Discuss 5-6 top stories in detail
+           - Include reactions like "[chuckles]", "[laughs]", "[sighs]", "Hmm...", "Oh wow!"
+           - Add personal anecdotes or analogies
+           - Ask follow-up questions and provide detailed explanations
+           - Make connections between different stories
+           - Include moments of surprise, skepticism, or excitement
+        
+        3. INDUSTRY ANALYSIS (6-8 turns):
+           - Connect today's news to broader trends
+           - Discuss implications for different stakeholders
+           - Share interesting statistics or historical context
+        
+        4. CLOSING (3-4 turns):
+           - Summarize key takeaways
+           - Preview what to watch tomorrow
+           - Sign off with personality
+        
+        CONVERSATION STYLE:
+        - Include natural interruptions: "Actually, wait—", "Oh, that reminds me—"
+        - Add thinking sounds: "Hmm", "Well...", "You know..."
+        - Include laughs and reactions in brackets: [laughs], [chuckles], [surprised]
+        - Use conversational fillers: "I mean", "You know what's interesting?", "Here's the thing"
+        - Make it feel unscripted with slight tangents and callbacks to earlier points
+        
+        IMPORTANT: Return ONLY a JSON array with this exact format, no markdown:
         [
-            {{"speaker": "host1", "text": "Opening line here...", "emotion": "neutral"}},
-            {{"speaker": "host2", "text": "Response here...", "emotion": "excited"}},
+            {{"speaker": "host1", "text": "Hey everyone, welcome back to Oil Field Insights Daily! [upbeat] It's {datetime.now().strftime('%B %d')}, and Sam, you're not going to believe what's happening in the Permian Basin today.", "emotion": "excited"}},
+            {{"speaker": "host2", "text": "[laughs] Oh no, what now? Every time you start like that, I know we're in for a wild ride!", "emotion": "amused"}},
             ...
         ]
         
-        Emotions can be: neutral, excited, thoughtful, concerned, optimistic
+        Emotions: neutral, excited, thoughtful, concerned, optimistic, amused, surprised, skeptical
+        
+        REMEMBER: Make this feel like a real conversation between friends who happen to be oil industry experts. Include enough content for 15 minutes of audio!
         """
         
-        # Generate with Gemini
+        # Generate with Gemini - increased tokens for longer script
         response = self.model.generate_content(
             prompt,
             generation_config={
                 'temperature': 0.9,
                 'top_p': 0.95,
-                'max_output_tokens': 4000,
+                'max_output_tokens': 8000,  # Doubled for 15-minute content
             }
         )
         
@@ -113,8 +139,8 @@ class DialogueScriptGenerator:
                     'emotion': item.get('emotion', 'neutral')
                 })
             
-            # Add closing if not present
-            if len(formatted_script) < 10:
+            # Add closing if script is too short
+            if len(formatted_script) < 30:  # Increased minimum for longer podcast
                 formatted_script.extend(self._add_closing())
             
             return formatted_script
