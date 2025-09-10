@@ -6,15 +6,22 @@ on:
     - cron: '0 11 * * *'  # 11 AM UTC daily (6 AM EST)
   workflow_dispatch:      # Manual trigger
 
+# Grant write permissions to GITHUB_TOKEN
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   generate-podcast:
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
       
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -36,8 +43,9 @@ jobs:
       
       - name: Commit and push podcast
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          # Configure git
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           
           # Add files with force flag to override gitignore if needed
           git add -f docs/episodes/*.mp3 || echo "No MP3 files to add"
@@ -49,7 +57,25 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "🎧 Add podcast for $(date +'%Y-%m-%d') [automated]"
-            git push
+            
+            # Try to push with retry logic
+            max_attempts=3
+            for attempt in $(seq 1 $max_attempts); do
+              echo "Push attempt $attempt/$max_attempts"
+              if git push origin main; then
+                echo "Push successful"
+                break
+              else
+                if [ $attempt -eq $max_attempts ]; then
+                  echo "All push attempts failed"
+                  exit 1
+                else
+                  echo "Push failed, retrying in 5 seconds..."
+                  sleep 5
+                  git pull --rebase origin main
+                fi
+              fi
+            done
           fi
       
       - name: Keep only last 30 episodes
@@ -63,8 +89,10 @@ jobs:
             ls -t *.mp3 | tail -n +31 | xargs -r rm
             cd ../..
             git add docs/episodes/
-            git commit -m "🗑️ Cleanup old episodes (keep latest 30) [automated]"
-            git push
+            if ! git diff --staged --quiet; then
+              git commit -m "🗑️ Cleanup old episodes (keep latest 30) [automated]"
+              git push origin main
+            fi
           else
             echo "Only $file_count episodes found, no cleanup needed"
           fi
