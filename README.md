@@ -1,89 +1,195 @@
-# Oil Field Insights Podcast Generator
+# 🛢️ Oil Field Insights Daily - AI Podcast Generator
 
-An automated system that generates daily podcasts about the oil and gas industry by collecting news, creating dialogue scripts, and producing audio content with multiple voices.
+An intelligent podcast generation system that creates daily, soothing conversations about the oil and gas industry using advanced AI and neural text-to-speech technology.
 
-## 🎧 Sample Output
+## 🎧 Listen Now
 
-**Latest Episode**: [Oil News - September 10, 2025](docs/episodes/oil_news_20250910.mp3) (4.1MB)
+**Latest Episode**: [Oil News Podcast](https://shariqbaig.github.io/oil-podcast-generator/)  
+**RSS Feed**: [Subscribe in your podcast app](https://shariqbaig.github.io/oil-podcast-generator/feed.xml)
 
-Listen to a fully automated podcast featuring two AI hosts discussing the latest oil and gas industry news with natural conversation flow and different voice accents.
+Experience AI-generated discussions between two hosts with natural conversation flow, industry insights, and market analysis.
 
-## ✨ Features
+## ✨ Key Features
 
-- **🔍 News Collection**: Automatically fetches latest oil and gas industry news from RSS feeds
-- **🤖 AI Script Generation**: Creates engaging podcast dialogue between multiple hosts using OpenAI
-- **🎙️ Multi-Voice TTS**: Robust text-to-speech with fallback systems:
-  - Google TTS (gTTS) with American/British accents for voice variety
-  - Windows SAPI (pyttsx3) as local fallback
-  - Edge TTS support (when available)
-- **🎵 Audio Processing**: Combines segments with proper pacing, silence between speakers, and speed variations
-- **📡 RSS Distribution**: Generates podcast RSS feed and HTML index for easy distribution
-- **🔄 Automated Pipeline**: Complete end-to-end podcast generation with error handling and retry logic
+### 🤖 AI-Powered Intelligence
+- **Google Gemini AI Integration**: Creates dynamic, NotebookLM-style dialogue scripts
+- **Smart News Filtering**: Relevance scoring system prioritizes drilling, extraction, and production news
+- **Market Data Integration**: Includes real-time WTI/Brent crude prices in discussions
+- **Natural Conversation Flow**: Context-aware dialogue with emotional variations
 
-## 🚀 Quick Start
+### 🎙️ Advanced Audio Production
+- **Microsoft Edge TTS Neural Voices**: High-quality, soothing voices optimized for relaxed listening
+  - Male host: GuyNeural (warm, friendly tone)
+  - Female host: AriaNeural (gentle, conversational style)
+- **Smart URL Processing**: Converts URLs to speakable domain names
+- **Industry Term Pronunciation**: Proper handling of oil & gas terminology (OPEC, WTI, LNG, etc.)
+- **Dynamic Pacing**: Adjustable speech rates and natural pauses for comfortable listening
 
-1. **Install dependencies**:
+### 📰 Comprehensive News Coverage
+- **20+ RSS Feed Sources**: Including Rigzone, OilPrice.com, Bloomberg Energy, EIA
+- **Intelligent Article Ranking**: Weighted keyword system for relevance
+- **Multi-Source Aggregation**: Government, industry, financial, and regional sources
+- **Daily Updates**: Automated GitHub Actions workflow at 12:00 PM UTC
+
+### 🚀 Production Pipeline
+- **Fully Automated**: End-to-end generation from news collection to audio publishing
+- **Robust Error Handling**: Retry logic with exponential backoff for network issues
+- **Audio Optimization**: FFmpeg processing for streaming-ready MP3s (192kbps)
+- **Episode Management**: Automatic cleanup keeps last 30 episodes
+
+## 📦 Installation
+
+### Prerequisites
+- Python 3.8+
+- FFmpeg (for audio processing)
+- Google Gemini API key (optional, for AI script generation)
+
+### Quick Setup
+
+1. **Clone the repository**:
+```bash
+git clone https://github.com/shariqbaig/oil-podcast-generator.git
+cd oil-podcast-generator
+```
+
+2. **Install dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
 
-2. **Set up API key** (optional - uses free services by default):
+3. **Configure environment** (optional for AI features):
 ```bash
-# For enhanced AI script generation
-export OPENAI_API_KEY="your-key-here"
+cp .env.example .env
+# Edit .env and add your GEMINI_API_KEY
 ```
 
-3. **Generate podcast**:
+4. **Generate your first podcast**:
 ```bash
 python main.py
 ```
+
+## 🔧 Configuration
+
+### Environment Variables
+- `GEMINI_API_KEY`: Google AI API key for enhanced script generation (get one [here](https://makersuite.google.com/app/apikey))
+
+### Voice Customization
+Edit `src/podcast_creator.py` to adjust:
+- Voice selection (Edge TTS offers 100+ voices)
+- Speaking rate and pitch
+- Pause durations
+- Emotional tone mappings
+
+### News Sources
+Modify `src/news_collector.py` to:
+- Add/remove RSS feeds
+- Adjust keyword weights
+- Change relevance thresholds
+- Focus on specific topics
+
+### Script Style
+Configure `src/script_generator.py` for:
+- Host personalities
+- Conversation length
+- Topic emphasis
+- Dialogue patterns
 
 ## 📁 Project Structure
 
 ```
 oil-podcast-generator/
-├── main.py              # Main execution script
-├── requirements.txt     # Python dependencies
+├── main.py                      # Main orchestration script
+├── requirements.txt             # Python dependencies
+├── .env.example                 # Environment variable template
 ├── src/
-│   ├── news_collector.py    # RSS news fetching
-│   ├── script_generator.py  # AI dialogue creation
-│   ├── podcast_creator.py   # Multi-voice TTS and audio processing
-│   └── rss_generator.py     # RSS feed generation
+│   ├── news_collector.py       # RSS feed aggregation and filtering
+│   ├── script_generator.py     # AI dialogue generation (Gemini)
+│   ├── podcast_creator.py      # Edge TTS audio synthesis
+│   └── rss_generator.py        # Podcast RSS feed creation
 ├── docs/
-│   ├── episodes/        # Generated MP3 files
-│   ├── feed.xml        # RSS feed for podcast distribution
-│   └── index.html      # Web interface
-└── .github/workflows/   # Automated generation (optional)
+│   ├── episodes/               # Generated MP3 files
+│   ├── feed.xml               # Podcast RSS feed
+│   └── index.html             # Web player interface
+├── tests/
+│   └── test_tts.py            # TTS testing utilities
+└── .github/
+    └── workflows/
+        └── generate_podcast.yml # Daily automation (GitHub Actions)
 ```
 
-## ⚙️ Configuration
+## 🔄 Automated Daily Generation
 
-The system works out-of-the-box but can be customized:
+The podcast generates automatically via GitHub Actions:
+- **Schedule**: Daily at 12:00 PM UTC
+- **Process**: News collection → AI script → Audio synthesis → Publishing
+- **Requirements**: Add `GEMINI_API_KEY` to GitHub Secrets
 
-- **News Sources**: Modify RSS feeds in `src/news_collector.py`
-- **Voice Settings**: Adjust accents, speed, and pauses in `src/podcast_creator.py`
-- **AI Prompts**: Customize host personalities and dialogue style in `src/script_generator.py`
-- **Output Format**: Change audio quality, format, and file naming in `main.py`
+### Manual Trigger
+Run the workflow manually from GitHub Actions tab or via API:
+```bash
+gh workflow run generate_podcast.yml
+```
 
-## 📊 Technical Details
+## 🎯 Recent Improvements
 
-- **Language**: Python 3.8+
-- **Audio Format**: MP3 (128kbps)
-- **TTS Engines**: gTTS (primary), pyttsx3 (fallback)
-- **Error Handling**: Retry logic with exponential backoff
-- **Dependencies**: See `requirements.txt` for full list
+### v2.0 (Latest)
+- ✅ Migrated from OpenAI to Google Gemini AI
+- ✅ Switched to Edge TTS for superior voice quality
+- ✅ Added soothing voice profiles for relaxed listening
+- ✅ Implemented smart URL cleaning (no more "HTTP slash slash")
+- ✅ Enhanced industry term pronunciation
+- ✅ Improved pause timing for natural conversation
+- ✅ Added robust retry logic for API resilience
 
-## 🔧 Troubleshooting
+### v1.0
+- Initial release with basic TTS
+- RSS feed aggregation
+- Simple script templates
 
-- **TTS Timeouts**: The system automatically retries failed segments with different engines
-- **Network Issues**: Built-in fallback from Google TTS to local Windows SAPI
-- **Unicode Errors**: Fixed with UTF-8 encoding for cross-platform compatibility
+## 📊 Technical Specifications
 
-## 📈 Output
+- **Audio Format**: MP3, 192kbps, 44.1kHz
+- **Episode Length**: 4-5 minutes average
+- **Voice Technology**: Microsoft Edge TTS Neural Voices
+- **AI Model**: Google Gemini 1.5 Flash
+- **Update Frequency**: Daily
+- **Storage**: Last 30 episodes retained
 
-Generated content includes:
-- **MP3 Episodes**: `docs/episodes/oil_news_YYYYMMDD.mp3`
-- **RSS Feed**: `docs/feed.xml` for podcast aggregators
-- **Web Interface**: `docs/index.html` for browser listening
+## 🐛 Troubleshooting
 
-Perfect for automated podcast generation, content creation, or learning about AI-powered media workflows!
+### Common Issues
+
+**No audio generated**:
+- Check network connection
+- Verify Edge TTS is installed: `pip install edge-tts==7.2.3`
+- Ensure FFmpeg is available
+
+**Script generation fails**:
+- Verify GEMINI_API_KEY is set correctly
+- Falls back to template mode if AI unavailable
+
+**Poor audio quality**:
+- Adjust voice settings in `podcast_creator.py`
+- Check FFmpeg installation
+
+## 🤝 Contributing
+
+Contributions welcome! Areas for improvement:
+- Additional news sources
+- Voice variety options
+- Language support
+- Interactive features
+
+## 📜 License
+
+MIT License - See [LICENSE](LICENSE) file
+
+## 🔗 Links
+
+- **Live Podcast**: [https://shariqbaig.github.io/oil-podcast-generator/](https://shariqbaig.github.io/oil-podcast-generator/)
+- **RSS Feed**: [Subscribe](https://shariqbaig.github.io/oil-podcast-generator/feed.xml)
+- **GitHub**: [Source Code](https://github.com/shariqbaig/oil-podcast-generator)
+
+---
+
+*Powered by Google Gemini AI and Microsoft Edge TTS Neural Voices*

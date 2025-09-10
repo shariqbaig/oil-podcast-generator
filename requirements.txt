@@ -2,8 +2,10 @@
 feedparser==6.0.10
 pydub==0.25.1
 beautifulsoup4==4.12.2
-requests==2.31.0
+requests>=2.32.3
 python-dateutil==2.8.2
 lxml==4.9.3
-gtts==2.5.0
-pyttsx3==2.90
+edge-tts==7.2.3                     # Updated to fix 403 error
+google-generativeai==0.8.3         # For Gemini AI
+python-dotenv==1.0.0                # For environment variables
+aiofiles==24.1.0                    # For async file operations

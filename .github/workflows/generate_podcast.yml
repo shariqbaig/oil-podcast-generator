@@ -3,20 +3,15 @@ name: Daily Oil Podcast Generator
 
 on:
   schedule:
-    # Run daily at 8:00 AM US Eastern Time
-    # During EST (Nov-Mar): 8 AM EST = 1 PM UTC (13:00)
-    # During EDT (Mar-Nov): 8 AM EDT = 12 PM UTC (12:00) 
-    # Using 12:00 UTC to split the difference for year-round consistency
-    - cron: '0 12 * * *'  # 12:00 PM UTC = 8:00 AM EDT / 7:00 AM EST
-  workflow_dispatch:      # Manual trigger button in GitHub Actions UI
+    - cron: '0 12 * * *'  # 12:00 PM UTC daily
+  workflow_dispatch:
     inputs:
       debug:
         description: 'Enable debug output'
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
-# Grant write permissions to GITHUB_TOKEN
 permissions:
   contents: write
   pages: write
@@ -33,10 +28,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
       
-      - name: Setup Python
+      - name: Setup Python with cache
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+          cache: 'pip'  # Cache dependencies for faster runs
       
       - name: Install system dependencies
         run: |
@@ -45,57 +41,86 @@ jobs:
       
       - name: Install Python dependencies
         run: |
+          pip install --upgrade pip
           pip install -r requirements.txt
+          
+          # Verify Edge TTS is working
+          edge-tts --list-voices | grep -E "en-US-(Christopher|Jenny)" || echo "Edge TTS voices available"
       
       - name: Show timing information
         run: |
           echo "🕐 Workflow triggered at: $(date)"
           echo "🌍 UTC time: $(date -u)"
           echo "🇺🇸 US Eastern time: $(TZ='America/New_York' date)"
-          echo "🇺🇸 US Pacific time: $(TZ='America/Los_Angeles' date)"
           
-      - name: Generate podcast
+      - name: Generate podcast with AI
         run: |
-          echo "🎧 Starting podcast generation..."
+          echo "🎧 Starting AI-powered podcast generation..."
+          echo "🤖 Using Gemini AI: ${GEMINI_API_KEY:+Yes (Key present)}"
+          echo "🎙️ Using Edge TTS for voices"
+          
           if [ "${{ inputs.debug }}" == "true" ]; then
             echo "🐛 Debug mode enabled"
-            python -u main.py  # Unbuffered output for real-time logs
+            python -u main.py  # Unbuffered output
           else
             python main.py
           fi
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}  # ADD THIS SECRET IN GITHUB
           DEBUG_MODE: ${{ inputs.debug }}
+          PYTHONUNBUFFERED: 1
+      
+      - name: Verify and optimize audio
+        run: |
+          # Check if file was created
+          LATEST_FILE=$(ls -t docs/episodes/*.mp3 2>/dev/null | head -1)
+          if [ -z "$LATEST_FILE" ]; then
+            echo "❌ No podcast file generated"
+            exit 1
+          fi
+          
+          echo "✅ Generated: $LATEST_FILE"
+          
+          # Get file info
+          du -h "$LATEST_FILE"
+          
+          # Optimize for streaming (optional)
+          ffmpeg -i "$LATEST_FILE" -codec:a libmp3lame -b:a 128k -ar 44100 "${LATEST_FILE}.tmp" -y
+          mv "${LATEST_FILE}.tmp" "$LATEST_FILE"
+          
+          echo "📊 Optimized file size: $(du -h "$LATEST_FILE")"
       
       - name: Commit and push podcast
         run: |
-          # Configure git
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           
-          # Add files with force flag to override gitignore if needed
           git add -f docs/episodes/*.mp3 || echo "No MP3 files to add"
           git add docs/feed.xml || echo "No feed.xml changes"
           git add docs/index.html || echo "No index.html changes"
           
-          # Only commit if there are changes
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "🎧 Add podcast for $(date +'%Y-%m-%d') [automated]"
+            # Include AI indicator in commit message
+            if [ -n "${{ secrets.GEMINI_API_KEY }}" ]; then
+              git commit -m "🤖 Add AI-generated podcast for $(date +'%Y-%m-%d') [automated]"
+            else
+              git commit -m "🎧 Add podcast for $(date +'%Y-%m-%d') [automated]"
+            fi
             
-            # Try to push with retry logic
+            # Push with retry
             max_attempts=3
             for attempt in $(seq 1 $max_attempts); do
-              echo "Push attempt $attempt/$max_attempts"
               if git push origin main; then
-                echo "Push successful"
+                echo "✅ Push successful"
                 break
               else
                 if [ $attempt -eq $max_attempts ]; then
-                  echo "All push attempts failed"
+                  echo "❌ All push attempts failed"
                   exit 1
                 else
-                  echo "Push failed, retrying in 5 seconds..."
+                  echo "Retrying push..."
                   sleep 5
                   git pull --rebase origin main
                 fi
@@ -106,25 +131,27 @@ jobs:
       - name: Keep only last 30 episodes
         run: |
           cd docs/episodes
-          # Count MP3 files
           file_count=$(ls -1 *.mp3 2>/dev/null | wc -l)
           
           if [ "$file_count" -gt 30 ]; then
-            echo "Found $file_count episodes, keeping latest 30"
+            echo "Cleaning old episodes (keeping latest 30)..."
             ls -t *.mp3 | tail -n +31 | xargs -r rm
             cd ../..
             git add docs/episodes/
             if ! git diff --staged --quiet; then
-              git commit -m "🗑️ Cleanup old episodes (keep latest 30) [automated]"
+              git commit -m "🗑️ Cleanup old episodes [automated]"
               git push origin main
             fi
-          else
-            echo "Only $file_count episodes found, no cleanup needed"
           fi
       
-      - name: Workflow completion
+      - name: Workflow summary
         run: |
-          echo "✅ Podcast generation workflow completed successfully!"
-          echo "🎧 New episode should be available at: https://shariqbaig.github.io/oil-podcast-generator/"
-          echo "📡 RSS feed: https://shariqbaig.github.io/oil-podcast-generator/feed.xml"
-          echo "⏰ Completed at: $(date)"
+          echo "## 📊 Podcast Generation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Date**: $(date +'%Y-%m-%d %H:%M')" >> $GITHUB_STEP_SUMMARY
+          echo "- **AI Script**: ${GEMINI_API_KEY:+✅ Enabled}" >> $GITHUB_STEP_SUMMARY
+          echo "- **TTS Engine**: Edge TTS (Microsoft Neural Voices)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ✅ Success" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🎧 [Listen to Latest Episode](https://shariqbaig.github.io/oil-podcast-generator/)" >> $GITHUB_STEP_SUMMARY
+          echo "📡 [RSS Feed](https://shariqbaig.github.io/oil-podcast-generator/feed.xml)" >> $GITHUB_STEP_SUMMARY

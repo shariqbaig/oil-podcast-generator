@@ -10,27 +10,38 @@ from src.rss_generator import PodcastRSSGenerator
 async def generate_daily_podcast():
     """Main function to generate daily podcast"""
     
-    print("Starting Oil Field Insights podcast generation...")
+    print("=" * 60)
+    print("Oil Field Insights - AI Podcast Generator")
+    print("=" * 60)
+    
+    # Check for AI capabilities
+    if os.getenv('GEMINI_API_KEY'):
+        print("[OK] Gemini AI enabled for enhanced script generation")
+    else:
+        print("[INFO] Using template-based script generation (set GEMINI_API_KEY for AI)")
     
     # 1. Collect and filter news
-    print("Collecting news...")
+    print("\n[STEP 1] Collecting news...")
     collector = SmartNewsCollector()
     articles = collector.fetch_and_filter_news()
     market_data = collector.get_market_data()
     
     if not articles:
-        print("No relevant news found today")
+        print("[ERROR] No relevant news found today")
         return
     
-    print(f"Found {len(articles)} relevant articles")
+    print(f"[OK] Found {len(articles)} relevant articles")
+    for i, article in enumerate(articles[:5], 1):
+        print(f"   {i}. {article['title'][:60]}...")
     
     # 2. Generate dialogue script
-    print("Generating script...")
+    print("\n[STEP 2] Generating script...")
     generator = DialogueScriptGenerator()
     dialogue_script = generator.generate_dialogue_script(articles, market_data)
+    print(f"[OK] Generated {len(dialogue_script)} dialogue segments")
     
     # 3. Create multi-voice podcast
-    print("Creating podcast...")
+    print("\n[STEP 3] Creating podcast with Edge TTS...")
     creator = MultiVoicePodcastCreator()
     
     # Ensure directories exist
@@ -42,14 +53,21 @@ async def generate_daily_podcast():
     await creator.create_podcast(dialogue_script, output_file)
     
     # 4. Update RSS feed
-    print("Updating RSS feed...")
+    print("\n[STEP 4] Updating RSS feed...")
     rss_gen = PodcastRSSGenerator()
     rss_gen.generate_rss_feed()
+    print("[OK] RSS feed updated")
     
     # 5. Generate HTML index
+    print("\n[STEP 5] Updating HTML index...")
     generate_html_index()
+    print("[OK] HTML index updated")
     
-    print(f"Podcast generated successfully: {output_file}")
+    print("\n" + "=" * 60)
+    print(f"[SUCCESS] PODCAST GENERATED SUCCESSFULLY!")
+    print(f"[FILE] {output_file}")
+    print(f"[URL] https://shariqbaig.github.io/oil-podcast-generator/")
+    print("=" * 60)
 
 def generate_html_index():
     """Generate simple HTML page for GitHub Pages"""
@@ -64,25 +82,27 @@ def generate_html_index():
             .subscribe-section { background: #f0f0f0; padding: 20px; border-radius: 10px; margin: 20px 0; }
             .episode { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
             button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+            .ai-badge { background: #4CAF50; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px; }
         </style>
     </head>
     <body>
         <h1>🛢️ Oil Field Insights Daily</h1>
-        <p>Your AI-generated daily podcast covering the latest in oil and gas industry news.</p>
+        <p>Your AI-generated daily podcast covering the latest in oil and gas industry news. 
+        <span class="ai-badge">AI Powered</span></p>
         
         <div class="subscribe-section">
             <h2>Subscribe to Podcast</h2>
             <p>Copy this RSS feed URL to your podcast app:</p>
-            <input type="text" value="https://YOUR-USERNAME.github.io/oil-podcast-generator/feed.xml" readonly style="width: 100%; padding: 10px;">
+            <input type="text" value="https://shariqbaig.github.io/oil-podcast-generator/feed.xml" readonly style="width: 100%; padding: 10px;">
             
             <h3>Direct Links:</h3>
-            <a href="https://podcasts.apple.com/feed?url=https://YOUR-USERNAME.github.io/oil-podcast-generator/feed.xml">
+            <a href="https://podcasts.apple.com/feed?url=https://shariqbaig.github.io/oil-podcast-generator/feed.xml">
                 <button>Apple Podcasts</button>
             </a>
-            <a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9ZT1VSLVVTRVJOQU1FLmdpdGh1Yi5pby9vaWwtcG9kY2FzdC1nZW5lcmF0b3IvZmVlZC54bWw=">
+            <a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9zaGFyaXFiYWlnLmdpdGh1Yi5pby9vaWwtcG9kY2FzdC1nZW5lcmF0b3IvZmVlZC54bWw=">
                 <button>Google Podcasts</button>
             </a>
-            <a href="https://open.spotify.com/show/submit?feed=https://YOUR-USERNAME.github.io/oil-podcast-generator/feed.xml">
+            <a href="https://open.spotify.com/show/submit?feed=https://shariqbaig.github.io/oil-podcast-generator/feed.xml">
                 <button>Submit to Spotify</button>
             </a>
         </div>
@@ -113,7 +133,7 @@ def generate_html_index():
                                     <h3>${title}</h3>
                                     <p>${new Date(date).toLocaleDateString()}</p>
                                     <audio controls>
-                                        <source src="${url.replace('https://YOUR-USERNAME.github.io/oil-podcast-generator/', '')}" type="audio/mpeg">
+                                        <source src="${url.replace('https://shariqbaig.github.io/oil-podcast-generator/', '')}" type="audio/mpeg">
                                     </audio>
                                 </div>
                             `;
@@ -126,7 +146,7 @@ def generate_html_index():
     """
     
     with open('docs/index.html', 'w', encoding='utf-8') as f:
-        f.write(html_content.replace('YOUR-USERNAME', os.environ.get('GITHUB_REPOSITORY_OWNER', 'shariqbaig')))
+        f.write(html_content)
 
 if __name__ == "__main__":
     asyncio.run(generate_daily_podcast())
