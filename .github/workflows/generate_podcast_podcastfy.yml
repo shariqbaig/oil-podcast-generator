@@ -37,34 +37,22 @@ jobs:
         run: |
           pip install --upgrade pip setuptools wheel
           
-          # Install requirements except podcastfy (commented out in requirements.txt)
+          # Install base requirements
           pip install -r requirements.txt
           
-          # Install specific numpy version compatible with both
-          pip install "numpy<2,>=1.24.3"
+          # Install podcastfy with all its dependencies (will install edge-tts 6.x)
+          pip install podcastfy==0.4.1
           
-          # Install all podcastfy dependencies EXCEPT edge-tts
-          pip install \
-            typer \
-            types-pyyaml>=6.0.12.20240917 \
-            wheel>=0.44.0 \
-            youtube-transcript-api>=0.6.2 \
-            PyMuPDF>=1.24.11 \
-            cython>=3.0.11 \
-            pandoc>=2.4 \
-            pytest>=8.3.3 \
-            pytest-xdist>=3.6.1
+          # Now force upgrade edge-tts to 7.2.3 (ignore dependency conflict)
+          pip install --force-reinstall --no-deps edge-tts==7.2.3
           
-          # Install podcastfy without dependencies
-          pip install podcastfy==0.4.1 --no-deps
-          
-          # Force install edge-tts 7.2.3 (override podcastfy requirement)
-          pip uninstall edge-tts -y
-          pip install edge-tts==7.2.3
+          # Reinstall edge-tts dependencies for 7.2.3
+          pip install aiohttp certifi tabulate typing-extensions
           
           # Verify installation
           python -c "from podcastfy.client import generate_podcast; print('✓ Podcastfy installed')"
-          edge-tts --version && echo "✓ Edge TTS 7.2.3 installed"
+          edge-tts --version && echo "✓ Edge TTS version:"
+          pip show edge-tts | grep Version
           edge-tts --list-voices | head -5 && echo "✓ Edge TTS working"
       
       - name: Generate podcast with Podcastfy
