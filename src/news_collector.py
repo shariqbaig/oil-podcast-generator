@@ -88,6 +88,20 @@ class SmartNewsCollector:
         # Boost for recent content (within 24 hours)
         return score
     
+    def format_time_ago(self, hours):
+        """Format hours into human-readable time ago string"""
+        if hours < 1:
+            return "Just now"
+        elif hours < 2:
+            return "1 hour ago"
+        elif hours < 24:
+            return f"{int(hours)} hours ago"
+        elif hours < 48:
+            return "Yesterday"
+        else:
+            days = int(hours / 24)
+            return f"{days} days ago"
+    
     def fetch_and_filter_news(self):
         """Collect and intelligently filter news"""
         all_articles = []
@@ -124,16 +138,45 @@ class SmartNewsCollector:
                     if score > 0:
                         # Try to get publication date
                         pub_date = entry.get('published_parsed', None)
+                        pub_datetime = None
+                        
                         if pub_date:
-                            pub_datetime = datetime.fromtimestamp(
-                                datetime(*pub_date[:6]).timestamp()
-                            )
-                            # Boost recent articles
+                            try:
+                                pub_datetime = datetime.fromtimestamp(
+                                    datetime(*pub_date[:6]).timestamp()
+                                )
+                            except:
+                                pub_datetime = None
+                        
+                        # If no parsed date, try to parse from published string
+                        if not pub_datetime and hasattr(entry, 'published'):
+                            try:
+                                from dateutil import parser
+                                pub_datetime = parser.parse(entry.published)
+                            except:
+                                pub_datetime = None
+                        
+                        # Calculate article age
+                        if pub_datetime:
                             hours_old = (datetime.now() - pub_datetime).total_seconds() / 3600
-                            if hours_old < 24:
+                            
+                            # ONLY include articles from last 48 hours (2 days)
+                            if hours_old > 48:
+                                continue  # Skip old articles
+                            
+                            # Boost recent articles
+                            if hours_old < 6:  # Less than 6 hours old
+                                score += 10
+                            elif hours_old < 12:  # Less than 12 hours old
+                                score += 7
+                            elif hours_old < 24:  # Less than 24 hours old
                                 score += 5
-                            elif hours_old < 48:
+                            elif hours_old < 48:  # Less than 48 hours old
                                 score += 2
+                            
+                            time_ago = self.format_time_ago(hours_old)
+                        else:
+                            time_ago = "Recently"
                         
                         all_articles.append({
                             'title': entry.title,
@@ -141,7 +184,8 @@ class SmartNewsCollector:
                             'link': entry.link,
                             'source': feed.feed.title if hasattr(feed, 'feed') else 'Unknown',
                             'score': score,
-                            'published': pub_datetime if pub_date else datetime.now()
+                            'published': pub_datetime if pub_datetime else datetime.now(),
+                            'time_ago': time_ago if pub_datetime else "Recently"
                         })
             except Exception as e:
                 print(f"Error processing feed {feed_url}: {e}")
@@ -163,15 +207,83 @@ class SmartNewsCollector:
         return final_articles
 
     def get_market_data(self):
-        """Fetch current oil prices (using free API)"""
+        """Fetch current oil prices from Alpha Vantage"""
+        import os
+        import requests
+        from dotenv import load_dotenv
+        
+        load_dotenv()
+        api_key = os.getenv('ALPHA_VANTAGE_API_KEY')
+        
+        if not api_key:
+            print("[WARNING] ALPHA_VANTAGE_API_KEY not found in environment")
+            return None
+        
         try:
-            # Using a free commodity API or scraping
-            # For demo, returning mock data - replace with actual API
-            return {
-                'wti_crude': 75.50,
-                'brent_crude': 79.30,
-                'change_wti': '+1.2%',
-                'change_brent': '+0.8%'
+            # Fetch WTI Crude (CL=F) and Brent Crude (BZ=F) data
+            # Alpha Vantage uses WTI and BRENT as commodity symbols
+            wti_url = f"https://www.alphavantage.co/query?function=WTI&interval=daily&apikey={api_key}"
+            brent_url = f"https://www.alphavantage.co/query?function=BRENT&interval=daily&apikey={api_key}"
+            
+            print("[INFO] Fetching WTI Crude data from Alpha Vantage...")
+            wti_response = requests.get(wti_url, timeout=10)
+            wti_data = wti_response.json()
+            
+            print("[INFO] Fetching Brent Crude data from Alpha Vantage...")
+            brent_response = requests.get(brent_url, timeout=10)
+            brent_data = brent_response.json()
+            
+            # Debug: Print raw response
+            print(f"[DEBUG] WTI Response: {wti_data}")
+            print(f"[DEBUG] Brent Response: {brent_data}")
+            
+            # Check for API errors
+            if 'Error Message' in wti_data or 'Error Message' in brent_data:
+                print("[ERROR] Alpha Vantage API error - check your API key")
+                return None
+            
+            if 'Note' in wti_data or 'Note' in brent_data:
+                print("[WARNING] Alpha Vantage API rate limit reached (5 calls/minute for free tier)")
+                return None
+            
+            # Extract latest prices
+            if 'data' in wti_data and len(wti_data['data']) > 0:
+                wti_latest = float(wti_data['data'][0]['value'])
+                wti_previous = float(wti_data['data'][1]['value']) if len(wti_data['data']) > 1 else wti_latest
+                wti_change = ((wti_latest - wti_previous) / wti_previous) * 100
+                wti_change_str = f"{'+' if wti_change >= 0 else ''}{wti_change:.2f}%"
+            else:
+                print("[WARNING] No WTI data available")
+                return None
+            
+            if 'data' in brent_data and len(brent_data['data']) > 0:
+                brent_latest = float(brent_data['data'][0]['value'])
+                brent_previous = float(brent_data['data'][1]['value']) if len(brent_data['data']) > 1 else brent_latest
+                brent_change = ((brent_latest - brent_previous) / brent_previous) * 100
+                brent_change_str = f"{'+' if brent_change >= 0 else ''}{brent_change:.2f}%"
+            else:
+                print("[WARNING] No Brent data available")
+                return None
+            
+            market_data = {
+                'wti_crude': wti_latest,
+                'brent_crude': brent_latest,
+                'change_wti': wti_change_str,
+                'change_brent': brent_change_str
             }
-        except:
+            
+            print(f"[SUCCESS] Market Data Retrieved:")
+            print(f"  WTI Crude: ${wti_latest:.2f} ({wti_change_str})")
+            print(f"  Brent Crude: ${brent_latest:.2f} ({brent_change_str})")
+            
+            return market_data
+            
+        except requests.exceptions.RequestException as e:
+            print(f"[ERROR] Failed to fetch market data: {e}")
+            return None
+        except (KeyError, ValueError, IndexError) as e:
+            print(f"[ERROR] Failed to parse market data: {e}")
+            return None
+        except Exception as e:
+            print(f"[ERROR] Unexpected error fetching market data: {e}")
             return None

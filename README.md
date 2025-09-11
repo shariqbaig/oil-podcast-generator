@@ -72,16 +72,34 @@ cd oil-podcast-generator
 
 2. **Install dependencies**:
 ```bash
+# Install base requirements
 pip install -r requirements.txt
+
+# Install Podcastfy without dependencies to avoid conflicts
+pip install podcastfy==0.4.1 --no-deps
+
+# Force install edge-tts 7.2.3 (required for latest features)
+pip uninstall edge-tts -y
+pip install edge-tts==7.2.3
+
+# Install remaining Podcastfy dependencies
+pip install PyMuPDF>=1.24.11 cython>=3.0.11 pandoc>=2.4 pytest>=8.3.3 pytest-xdist>=3.6.1
 ```
 
-3. **Configure environment** (optional for AI features):
+3. **Configure environment** (required for AI features):
 ```bash
 cp .env.example .env
 # Edit .env and add your GEMINI_API_KEY
 ```
 
 4. **Generate your first podcast**:
+
+**Option 1: Using Podcastfy (recommended)**
+```bash
+python main_podcastfy.py
+```
+
+**Option 2: Using original Edge TTS script**
 ```bash
 python main.py
 ```
@@ -120,7 +138,8 @@ Configure `src/script_generator.py` for:
 
 ```
 oil-podcast-generator/
-├── main.py                      # Main orchestration script
+├── main.py                      # Main orchestration script (original)
+├── main_podcastfy.py            # Podcastfy-enhanced version
 ├── requirements.txt             # Python dependencies
 ├── .env.example                 # Environment variable template
 ├── src/
@@ -139,7 +158,8 @@ oil-podcast-generator/
 │   └── test_tts.py            # TTS testing utilities
 └── .github/
     └── workflows/
-        └── generate_podcast.yml # Daily automation (GitHub Actions)
+        ├── generate_podcast.yml         # Daily automation (original)
+        └── generate_podcast_podcastfy.yml # Podcastfy version
 ```
 
 ## 🎛️ Technical Architecture
@@ -239,6 +259,11 @@ gh workflow run generate_podcast.yml
 - Check network connection
 - Verify Edge TTS is installed: `pip install edge-tts==7.2.3`
 - Ensure FFmpeg is available
+
+**Podcastfy dependency conflicts**:
+- Always install podcastfy with `--no-deps` flag
+- Force reinstall edge-tts 7.2.3 after podcastfy installation
+- Follow the exact installation order in Quick Setup section
 
 **Script generation fails**:
 - Verify GEMINI_API_KEY is set correctly

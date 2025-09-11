@@ -1,0 +1,85 @@
+# .github/workflows/generate_podcast_podcastfy.yml - NEW WORKFLOW
+name: Podcastfy Oil Podcast Generator (Free)
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  generate-podcast:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+      
+      - name: Install Python dependencies with Podcastfy
+        run: |
+          pip install --upgrade pip
+          # Install requirements except podcastfy (commented out in requirements.txt)
+          pip install -r requirements.txt
+          
+          # Install podcastfy without dependencies to avoid edge-tts downgrade
+          pip install podcastfy==0.4.1 --no-deps
+          
+          # Force install edge-tts 7.2.3 (in case it got downgraded)
+          pip uninstall edge-tts -y
+          pip install edge-tts==7.2.3
+          
+          # Install any missing podcastfy dependencies (except edge-tts)
+          pip install PyMuPDF>=1.24.11 cython>=3.0.11 pandoc>=2.4 pytest>=8.3.3 pytest-xdist>=3.6.1
+          
+          # Verify installation
+          python -c "from podcastfy.client import generate_podcast; print('✓ Podcastfy installed')"
+          edge-tts --version && echo "✓ Edge TTS 7.2.3 installed"
+          edge-tts --list-voices | head -5 && echo "✓ Edge TTS working"
+      
+      - name: Generate podcast with Podcastfy
+        run: |
+          echo "🎧 Starting Podcastfy generation..."
+          python main_podcastfy.py
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+          PODCAST_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          PYTHONUNBUFFERED: 1
+      
+      - name: Optimize audio
+        run: |
+          LATEST_FILE=$(ls -t docs/episodes/*.mp3 2>/dev/null | head -1)
+          if [ -n "$LATEST_FILE" ]; then
+            echo "✅ Generated: $LATEST_FILE"
+            # Optimize for streaming
+            TEMP_FILE="${LATEST_FILE%.mp3}_temp.mp3"
+            ffmpeg -i "$LATEST_FILE" -codec:a libmp3lame -b:a 128k -ar 44100 "$TEMP_FILE" -y
+            mv "$TEMP_FILE" "$LATEST_FILE"
+            echo "📊 Optimized file size: $(du -h "$LATEST_FILE")"
+          fi
+      
+      - name: Commit and push
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add docs/
+          git commit -m "🎙️ Podcastfy-generated podcast for $(date +'%Y-%m-%d')" || echo "No changes"
+          git push

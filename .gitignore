@@ -70,3 +70,9 @@ logs/
 .env.local
 secrets.yaml
 api_keys.txt
+
+# Data folder
+data/
+
+# Temp podcast content file
+temp_podcast_content.txt

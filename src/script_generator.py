@@ -59,9 +59,9 @@ class DialogueScriptGenerator:
         
         Today's date: {datetime.now().strftime('%B %d, %Y')}
         
-        Market Data:
-        - WTI Crude: ${market_data.get('wti_crude', 75.50) if market_data else 75.50} ({market_data.get('change_wti', '+0.5%') if market_data else '+0.5%'})
-        - Brent Crude: ${market_data.get('brent_crude', 79.30) if market_data else 79.30} ({market_data.get('change_brent', '+0.8%') if market_data else '+0.8%'})
+        {"Market Data:" if market_data else ""}
+        {f"- WTI Crude: ${market_data.get('wti_crude'):.2f} ({market_data.get('change_wti')})" if market_data else ""}
+        {f"- Brent Crude: ${market_data.get('brent_crude'):.2f} ({market_data.get('change_brent')})" if market_data else ""}
         
         News Articles:
         {articles_text}
@@ -205,19 +205,19 @@ class DialogueScriptGenerator:
             'emotion': 'excited'
         })
         
-        # Market update if available
+        # Market update only if data is available
         if market_data:
             script.append({
                 'speaker': 'host1',
                 'text': f"But first, let's check the markets. WTI Crude is trading at "
-                       f"${market_data.get('wti_crude', 75.50)}, {market_data.get('change_wti', 'up slightly')} for the day.",
+                       f"${market_data.get('wti_crude'):.2f}, {market_data.get('change_wti')} for the day.",
                 'emotion': 'neutral'
             })
             
             script.append({
                 'speaker': 'host2',
-                'text': f"And Brent Crude is at ${market_data.get('brent_crude', 79.30)}, "
-                       f"{market_data.get('change_brent', 'showing some movement')}. "
+                'text': f"And Brent Crude is at ${market_data.get('brent_crude'):.2f}, "
+                       f"{market_data.get('change_brent')}. "
                        f"Interesting dynamics in the market today.",
                 'emotion': 'thoughtful'
             })

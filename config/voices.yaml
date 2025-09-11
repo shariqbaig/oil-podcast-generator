@@ -1,0 +1,34 @@
+# config/voices.yaml
+# Advanced Edge TTS voice configuration for better quality
+
+edge_voices:
+  primary:
+    host1:
+      voice: "en-US-AriaNeural"
+      style: "newscast-casual"  # More natural style
+      rate: "+5%"  # Slightly faster
+      pitch: "-2Hz"
+    host2:
+      voice: "en-US-GuyNeural"
+      style: "friendly"
+      rate: "+3%"
+      pitch: "-3Hz"
+  
+  # Voice variations for different emotions
+  emotions:
+    excited:
+      rate: "+10%"
+      pitch: "+3Hz"
+    thoughtful:
+      rate: "-5%"
+      pitch: "-2Hz"
+    surprised:
+      rate: "+8%"
+      pitch: "+5Hz"
+    
+  # Alternative voices for variety
+  alternatives:
+    - "en-US-JennyNeural"  # Alternative female
+    - "en-US-ChristopherNeural"  # Alternative male
+    - "en-GB-SoniaNeural"  # British accent for variety
+    - "en-US-EricNeural"  # Younger sounding

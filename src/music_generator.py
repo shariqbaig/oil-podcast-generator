@@ -107,3 +107,90 @@ class BackgroundMusicGenerator:
         mixed = speech_audio.overlay(music_ducked)
         
         return mixed
+
+
+def add_background_music(audio_file_path):
+    """
+    Add background music to an existing audio file
+    
+    Args:
+        audio_file_path: Path to the input audio file
+        
+    Returns:
+        Path to the output audio file with music
+    """
+    from pydub import AudioSegment
+    import os
+    
+    # Load the existing audio
+    audio = AudioSegment.from_mp3(audio_file_path)
+    
+    # Create music generator
+    generator = BackgroundMusicGenerator()
+    
+    # Generate ambient music for the audio duration
+    music = generator.create_ambient_music(len(audio))
+    
+    # Apply volume reduction to music
+    music = music - 25  # Reduce by 25dB to keep it subtle
+    
+    # Duck the music slightly more
+    music_ducked = music - 5  # Additional reduction during speech
+    
+    # Mix the audio with music
+    mixed = audio.overlay(music_ducked)
+    
+    # Save to a temporary file first
+    base_name = os.path.splitext(audio_file_path)[0]
+    output_path = f"{base_name}_with_music.mp3"
+    
+    # Export with good quality
+    mixed.export(output_path, format="mp3", bitrate="192k")
+    
+    return output_path
+
+
+def add_background_music_to_file(audio_file_path):
+    """
+    Add background music to an audio file in place
+    
+    Args:
+        audio_file_path: Path to the audio file to modify
+    """
+    from pydub import AudioSegment
+    import tempfile
+    import os
+    import shutil
+    
+    print(f"Loading audio from: {audio_file_path}")
+    
+    # Load the existing audio
+    audio = AudioSegment.from_mp3(audio_file_path)
+    
+    print(f"Audio duration: {len(audio)/1000:.1f} seconds")
+    
+    # Create music generator
+    generator = BackgroundMusicGenerator()
+    
+    # Generate ambient music for the audio duration
+    print("Generating ambient background music...")
+    music = generator.create_ambient_music(len(audio))
+    
+    # Apply volume reduction to music (make it very subtle)
+    music = music - 30  # Reduce by 30dB to keep it very subtle
+    
+    # Mix the audio with music
+    print("Mixing audio with background music...")
+    mixed = audio.overlay(music)
+    
+    # Save to a temporary file first
+    with tempfile.NamedTemporaryFile(suffix='.mp3', delete=False) as tmp_file:
+        temp_path = tmp_file.name
+    
+    # Export with good quality
+    mixed.export(temp_path, format="mp3", bitrate="192k")
+    
+    # Replace the original file
+    shutil.move(temp_path, audio_file_path)
+    
+    print(f"Background music added successfully")
