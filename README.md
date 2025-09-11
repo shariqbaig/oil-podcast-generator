@@ -1,10 +1,10 @@
 # 🛢️ Oil Field Insights Daily - AI Podcast Generator
 
-An intelligent podcast generation system that creates daily, soothing conversations about the oil and gas industry using advanced AI and neural text-to-speech technology.
+An intelligent podcast generation system that creates daily, engaging 15-minute conversations about the oil and gas industry using advanced AI, real-time market data, and neural text-to-speech technology.
 
 ## 🎧 About
 
-Experience AI-generated discussions between two hosts with natural conversation flow, industry insights, and market analysis. The podcast is distributed via RSS feed and can be hosted on any web server or podcast platform.
+Experience AI-generated discussions between two expert hosts with natural conversation flow, breaking industry news, and live market analysis. Features real-time oil price data from Alpha Vantage, enhanced Podcastfy integration for superior dialogue generation, and ambient background music for professional production quality.
 
 ## 🔄 Process Flow
 
@@ -28,39 +28,64 @@ graph TD
 
 ## ✨ Key Features
 
-### 🤖 AI-Powered Intelligence
-- **Google Gemini AI Integration**: Creates dynamic, NotebookLM-style dialogue scripts
-- **Smart News Filtering**: Relevance scoring system prioritizes drilling, extraction, and production news
-- **Market Data Integration**: Includes real-time WTI/Brent crude prices in discussions
-- **Natural Conversation Flow**: Context-aware dialogue with emotional variations
+### 🎯 Two Powerful Generation Modes
 
-### 🎙️ Advanced Audio Production
-- **Microsoft Edge TTS Neural Voices**: High-quality, natural voices with emotion support
-  - Male host: GuyNeural (warm, friendly tone)
-  - Female host: AriaNeural (gentle, conversational style)
-- **Ambient Background Music**: Subtle, auto-generated music with intelligent ducking
-- **Smart URL Processing**: Converts URLs to speakable domain names
-- **Industry Term Pronunciation**: Proper handling of oil & gas terminology (OPEC, WTI, LNG, etc.)
-- **Optimized Pacing**: Natural speech flow with minimal gaps for fluent conversation
+#### **Podcastfy Enhanced Mode** (Recommended)
+- **Superior Dialogue Generation**: Leverages Podcastfy's advanced conversation algorithms
+- **Extended Episodes**: 15-minute podcasts with 8000+ words of content
+- **Professional Production**: Integrated ambient background music
+- **Seamless Integration**: Works with your existing news collector and RSS generator
 
-### 📰 Comprehensive News Coverage
-- **20+ RSS Feed Sources**: Including Rigzone, OilPrice.com, Bloomberg Energy, EIA
-- **Intelligent Article Ranking**: Weighted keyword system for relevance
-- **Multi-Source Aggregation**: Government, industry, financial, and regional sources
-- **Daily Updates**: Automated GitHub Actions workflow at 12:00 PM UTC
+#### **Original Edge TTS Mode**
+- **Direct Control**: Full customization of voice parameters and timing
+- **Lightweight**: Minimal dependencies, faster generation
+- **Template Fallback**: Works even without AI API keys
 
-### 🚀 Production Pipeline
-- **Fully Automated**: End-to-end generation from news collection to audio publishing
-- **Robust Error Handling**: Retry logic with exponential backoff for network issues
-- **Audio Optimization**: FFmpeg processing for streaming-ready MP3s
-- **Episode Management**: Automatic cleanup keeps last 30 episodes
+### 💹 Real-Time Market Intelligence
+- **Alpha Vantage Integration**: Live WTI and Brent crude oil prices
+- **Daily Price Changes**: Percentage movements and trend analysis
+- **Smart Fallback**: Omits market section if data unavailable
+- **Free Tier Support**: Works with Alpha Vantage's free API (5 calls/minute)
+
+### 🤖 AI-Powered Content Generation
+- **Google Gemini 1.5 Flash**: Fast, intelligent script generation
+- **NotebookLM-Style Conversations**: Natural, engaging dialogue between hosts
+- **Industry Expertise**: Alex (petroleum engineer) and Sam (energy reporter) personas
+- **Emotional Dynamics**: Varied reactions, laughs, and thoughtful pauses
+
+### 📰 Smart News Aggregation
+- **48-Hour News Window**: Only includes recent, relevant articles
+- **20+ RSS Sources**: Rigzone, OilPrice.com, Bloomberg Energy, Reuters, and more
+- **Intelligent Scoring**: 
+  - Recency boost (6hrs: +10, 12hrs: +7, 24hrs: +5 points)
+  - Keyword weighting for drilling, OPEC, production topics
+  - Source diversity (max 2 articles per source)
+- **Time Display**: Shows "3 hours ago", "Yesterday" for each story
+
+### 🎙️ Professional Audio Production
+- **Edge TTS 7.2.3**: Latest neural voices with improved quality
+- **Ambient Background Music**: Subtle, auto-generated harmonic drones
+- **Smart Audio Ducking**: Music volume reduces during speech
+- **Multiple Voice Options**:
+  - GuyNeural: Warm, authoritative male voice
+  - AriaNeural: Friendly, engaging female voice
+- **Optimized Output**: 192kbps MP3 with 44.1kHz sample rate
+
+### 🚀 Automation & Distribution
+- **GitHub Actions Workflows**: Daily generation at 12:00 PM UTC
+- **RSS Feed Generation**: iTunes-compatible podcast feed
+- **GitHub Pages Hosting**: Free hosting for your podcast
+- **Episode Management**: Auto-cleanup keeps last 30 episodes
+- **Error Recovery**: Robust retry logic for API failures
 
 ## 📦 Installation
 
 ### Prerequisites
-- Python 3.8+
-- FFmpeg (for audio processing)
-- Google Gemini API key (optional, for AI script generation)
+- Python 3.8+ (3.11 recommended)
+- FFmpeg (for audio processing) - [Download here](https://ffmpeg.org/download.html)
+- API Keys (all optional but recommended):
+  - **Google Gemini API** - For AI script generation ([Get free key](https://makersuite.google.com/app/apikey))
+  - **Alpha Vantage API** - For real-time oil prices ([Get free key](https://www.alphavantage.co/support/#api-key))
 
 ### Quick Setup
 
@@ -86,10 +111,21 @@ pip install edge-tts==7.2.3
 pip install PyMuPDF>=1.24.11 cython>=3.0.11 pandoc>=2.4 pytest>=8.3.3 pytest-xdist>=3.6.1
 ```
 
-3. **Configure environment** (required for AI features):
+3. **Configure environment**:
 ```bash
 cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY
+```
+
+Edit `.env` and add your API keys:
+```env
+# Required for AI-generated scripts (get free key at makersuite.google.com)
+GEMINI_API_KEY=your-gemini-key-here
+
+# Optional: For real-time oil prices (get free key at alphavantage.co)
+ALPHA_VANTAGE_API_KEY=your-alpha-vantage-key-here
+
+# Optional: For custom hosting
+PODCAST_BASE_URL=https://yourdomain.com/podcast
 ```
 
 4. **Generate your first podcast**:
@@ -104,14 +140,40 @@ python main_podcastfy.py
 python main.py
 ```
 
+## 🚀 Quick Start Guide
+
+### Generate a Podcast in 3 Steps:
+
+1. **Set up your Gemini API key** (required):
+   ```bash
+   echo "GEMINI_API_KEY=your-key-here" > .env
+   ```
+
+2. **Optional: Add market data** (recommended):
+   ```bash
+   echo "ALPHA_VANTAGE_API_KEY=your-key-here" >> .env
+   ```
+
+3. **Run the generator**:
+   ```bash
+   python main_podcastfy.py  # For 15-minute podcast with music
+   # OR
+   python main.py           # For original version
+   ```
+
+Your podcast will be saved to `docs/episodes/` and the RSS feed will be updated automatically!
+
 ## 🔧 Configuration
 
 ### Environment Variables
-- `GEMINI_API_KEY`: Google AI API key for enhanced script generation (get one [here](https://makersuite.google.com/app/apikey))
-- `PODCAST_BASE_URL`: (Optional) Base URL for RSS feed generation
-  - For GitHub Pages: `https://[username].github.io/[repository-name]`
-  - For custom hosting: `https://yourdomain.com/podcast`
-  - If not set, uses relative paths
+
+| Variable | Required | Description | How to Get |
+|----------|----------|-------------|------------|
+| `GEMINI_API_KEY` | Yes | Google AI key for script generation | [Get free key](https://makersuite.google.com/app/apikey) |
+| `ALPHA_VANTAGE_API_KEY` | No | Real-time oil price data | [Get free key](https://www.alphavantage.co/support/#api-key) |
+| `PODCAST_BASE_URL` | No | Custom hosting URL for RSS feed | Your domain or GitHub Pages URL |
+
+**Note**: Without Alpha Vantage key, market data section is automatically omitted from podcasts.
 
 ### Voice Customization
 Edit `src/podcast_creator.py` to adjust:
@@ -210,72 +272,59 @@ Run the workflow manually from GitHub Actions tab or via API:
 gh workflow run generate_podcast.yml
 ```
 
-## 🎯 Recent Improvements
+## 🎯 Recent Major Updates
 
-### v2.3 (Latest)
-- ✅ Removed all hardcoded URLs for portability
-- ✅ Made RSS generator configurable via environment
-- ✅ Added automatic URL detection in GitHub Actions
+### v3.0 - Podcastfy & Market Data Integration (Latest)
+- ✅ **Podcastfy Integration**: Enhanced dialogue generation with 15-minute episodes
+- ✅ **Alpha Vantage API**: Real-time WTI and Brent crude oil prices
+- ✅ **Smart News Filtering**: 48-hour window with recency scoring
+- ✅ **Time Display**: Shows when each article was published
+- ✅ **Extended Content**: 8000+ words, 12 news stories per episode
+- ✅ **Edge TTS 7.2.3**: Fixed compatibility issues for better voice quality
+- ✅ **Background Music**: Professional ambient soundtrack with smart ducking
+- ✅ **GitHub Actions**: Dual workflows for both generation modes
+
+### v2.3 - Production Improvements
+- ✅ Configurable RSS feed URLs via environment variables
+- ✅ Automatic GitHub Pages URL detection
+- ✅ Improved error handling and retry logic
 - ✅ Enhanced documentation with flow diagrams
 
-### v2.2
-- ✅ Added subtle ambient background music generation
-- ✅ Improved speech fluency with reduced pauses
-- ✅ Removed excessive laugh sounds for more natural conversation
-- ✅ Optimized voice speeds for better flow
-- ✅ Enhanced audio mixing with music ducking
-
-### v2.1
-- ✅ Extended episodes to 15 minutes with deeper discussions
-- ✅ Added natural laughs, reactions, and conversational elements
-- ✅ Implemented 8 new emotion states (amused, surprised, skeptical)
-- ✅ Enhanced Gemini prompts for more engaging dialogue
-- ✅ Fixed ffmpeg workflow issues
-
-### v2.0
-- ✅ Migrated from OpenAI to Google Gemini AI
-- ✅ Switched to Edge TTS for superior voice quality
-- ✅ Added soothing voice profiles for relaxed listening
-- ✅ Implemented smart URL cleaning (no more "HTTP slash slash")
-- ✅ Enhanced industry term pronunciation
-- ✅ Improved pause timing for natural conversation
-- ✅ Added robust retry logic for API resilience
+### v2.0 - AI & Voice Upgrade
+- ✅ Google Gemini 1.5 Flash integration
+- ✅ Microsoft Edge TTS neural voices
+- ✅ NotebookLM-style conversations
+- ✅ Smart URL pronunciation
+- ✅ Industry term handling
 
 ## 📊 Technical Specifications
 
-- **Audio Format**: MP3, 192kbps, 44.1kHz (optimized to 128kbps in GitHub Actions)
-- **Episode Length**: 10-15 minutes (extended conversations)
-- **Voice Technology**: Microsoft Edge TTS Neural Voices
-- **AI Model**: Google Gemini 1.5 Flash
-- **Update Frequency**: Daily (configurable)
-- **Storage**: Last 30 episodes retained
-- **Background Music**: Auto-generated ambient soundscape
+| Component | Specification | Details |
+|-----------|--------------|---------|
+| **Audio Format** | MP3, 192kbps, 44.1kHz | Optimized to 128kbps in GitHub Actions |
+| **Episode Length** | 15 minutes | ~8000 words of content |
+| **Voice Technology** | Edge TTS 7.2.3 | Neural voices with emotion support |
+| **AI Model** | Google Gemini 1.5 Flash | Fast, efficient dialogue generation |
+| **Market Data** | Alpha Vantage API | Real-time WTI & Brent prices |
+| **News Window** | 48 hours | Prioritizes articles < 6 hours old |
+| **Update Frequency** | Daily at 12:00 PM UTC | Configurable via GitHub Actions |
+| **Storage Policy** | 30 episodes | Automatic cleanup of old files |
+| **Background Music** | Ambient harmonic drones | -30dB volume with smart ducking |
 
 ## 🐛 Troubleshooting
 
-### Common Issues
+### Common Issues & Solutions
 
-**No audio generated**:
-- Check network connection
-- Verify Edge TTS is installed: `pip install edge-tts==7.2.3`
-- Ensure FFmpeg is available
-
-**Podcastfy dependency conflicts**:
-- Always install podcastfy with `--no-deps` flag
-- Force reinstall edge-tts 7.2.3 after podcastfy installation
-- Follow the exact installation order in Quick Setup section
-
-**Script generation fails**:
-- Verify GEMINI_API_KEY is set correctly
-- Falls back to template mode if AI unavailable
-
-**Poor audio quality**:
-- Adjust voice settings in `podcast_creator.py`
-- Check FFmpeg installation
-
-**Background music issues**:
-- Ensure numpy is installed: `pip install numpy`
-- Check pydub installation
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| **No audio generated** | Network/TTS issues | • Check internet connection<br>• Verify Edge TTS: `pip install edge-tts==7.2.3`<br>• Ensure FFmpeg is installed |
+| **Podcastfy dependency conflicts** | Version mismatch | • Follow exact installation order in setup<br>• Use `pip install podcastfy==0.4.1 --no-deps`<br>• Force reinstall: `pip install --force-reinstall edge-tts==7.2.3` |
+| **No market data** | Missing API key | • Get free Alpha Vantage key<br>• Add to `.env` file<br>• Market section auto-omits if unavailable |
+| **Old news in podcast** | Date filtering | • Check RSS feed availability<br>• Verify system date/time<br>• Only last 48 hours included |
+| **Short podcast (<5 min)** | Using wrong script | • Use `main_podcastfy.py` for 15-min episodes<br>• Check word_count setting (should be 8000) |
+| **Script generation fails** | API key issue | • Verify GEMINI_API_KEY in `.env`<br>• Check API quota limits<br>• Falls back to template if unavailable |
+| **Background music missing** | Audio processing | • Install numpy: `pip install "numpy<2,>=1.24.3"`<br>• Check pydub: `pip install pydub`<br>• Verify FFmpeg installation |
+| **GitHub Actions failing** | Dependencies | • Check workflow logs<br>• Ensure secrets are set<br>• Use provided workflow files |
 
 ## 🤝 Contributing
 
