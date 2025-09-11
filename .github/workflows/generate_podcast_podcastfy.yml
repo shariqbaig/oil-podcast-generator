@@ -35,19 +35,32 @@ jobs:
       
       - name: Install Python dependencies with Podcastfy
         run: |
-          pip install --upgrade pip
+          pip install --upgrade pip setuptools wheel
+          
           # Install requirements except podcastfy (commented out in requirements.txt)
           pip install -r requirements.txt
           
-          # Install podcastfy without dependencies to avoid edge-tts downgrade
+          # Install specific numpy version compatible with both
+          pip install "numpy<2,>=1.24.3"
+          
+          # Install all podcastfy dependencies EXCEPT edge-tts
+          pip install \
+            typer \
+            types-pyyaml>=6.0.12.20240917 \
+            wheel>=0.44.0 \
+            youtube-transcript-api>=0.6.2 \
+            PyMuPDF>=1.24.11 \
+            cython>=3.0.11 \
+            pandoc>=2.4 \
+            pytest>=8.3.3 \
+            pytest-xdist>=3.6.1
+          
+          # Install podcastfy without dependencies
           pip install podcastfy==0.4.1 --no-deps
           
-          # Force install edge-tts 7.2.3 (in case it got downgraded)
+          # Force install edge-tts 7.2.3 (override podcastfy requirement)
           pip uninstall edge-tts -y
           pip install edge-tts==7.2.3
-          
-          # Install any missing podcastfy dependencies (except edge-tts)
-          pip install PyMuPDF>=1.24.11 cython>=3.0.11 pandoc>=2.4 pytest>=8.3.3 pytest-xdist>=3.6.1
           
           # Verify installation
           python -c "from podcastfy.client import generate_podcast; print('✓ Podcastfy installed')"

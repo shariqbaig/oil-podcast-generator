@@ -10,4 +10,4 @@ edge-tts==7.2.3
 google-generativeai==0.8.3
 python-dotenv==1.0.1
 aiofiles==24.1.0
-numpy>=1.24.3
+numpy>=1.24.3,<2.0.0  # Keep numpy < 2 for podcastfy compatibility
