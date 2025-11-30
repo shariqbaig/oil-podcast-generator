@@ -21,12 +21,22 @@
     <itunes:image href="https://shariqbaig.github.io/oil-podcast-generator/podcast-cover.jpg" />
     <generator>Oil Podcast Generator v1.0</generator>
     <item>
+      <title>Oil Field Insights - November 30, 2025</title>
+      <description>Daily oil and gas industry news for November 30, 2025. AI-generated podcast featuring two hosts discussing the latest developments, market trends, and industry insights.</description>
+      <guid isPermaLink="false">oil_podcast_20251130</guid>
+      <pubDate>Sun, 30 Nov 2025 00:00:00 +0000</pubDate>
+      <enclosure url="https://shariqbaig.github.io/oil-podcast-generator/episodes/oil_news_20251130.mp3" type="audio/mpeg" length="3144142" />
+      <itunes:duration>3:11</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+      <itunes:keywords>oil, gas, energy, industry, news, AI, podcast, drilling, OPEC, crude</itunes:keywords>
+    </item>
+    <item>
       <title>Oil Field Insights - November 29, 2025</title>
       <description>Daily oil and gas industry news for November 29, 2025. AI-generated podcast featuring two hosts discussing the latest developments, market trends, and industry insights.</description>
       <guid isPermaLink="false">oil_podcast_20251129</guid>
       <pubDate>Sat, 29 Nov 2025 00:00:00 +0000</pubDate>
-      <enclosure url="https://shariqbaig.github.io/oil-podcast-generator/episodes/oil_news_20251129.mp3" type="audio/mpeg" length="3393663" />
-      <itunes:duration>3:27</itunes:duration>
+      <enclosure url="https://shariqbaig.github.io/oil-podcast-generator/episodes/oil_news_20251129.mp3" type="audio/mpeg" length="2262457" />
+      <itunes:duration>2:18</itunes:duration>
       <itunes:explicit>no</itunes:explicit>
       <itunes:keywords>oil, gas, energy, industry, news, AI, podcast, drilling, OPEC, crude</itunes:keywords>
     </item>
@@ -317,16 +327,6 @@
       <pubDate>Mon, 06 Oct 2025 00:00:00 +0000</pubDate>
       <enclosure url="https://shariqbaig.github.io/oil-podcast-generator/episodes/oil_news_20251006.mp3" type="audio/mpeg" length="2388680" />
       <itunes:duration>2:25</itunes:duration>
-      <itunes:explicit>no</itunes:explicit>
-      <itunes:keywords>oil, gas, energy, industry, news, AI, podcast, drilling, OPEC, crude</itunes:keywords>
-    </item>
-    <item>
-      <title>Oil Field Insights - October 03, 2025</title>
-      <description>Daily oil and gas industry news for October 03, 2025. AI-generated podcast featuring two hosts discussing the latest developments, market trends, and industry insights.</description>
-      <guid isPermaLink="false">oil_podcast_20251003</guid>
-      <pubDate>Fri, 03 Oct 2025 00:00:00 +0000</pubDate>
-      <enclosure url="https://shariqbaig.github.io/oil-podcast-generator/episodes/oil_news_20251003.mp3" type="audio/mpeg" length="2331838" />
-      <itunes:duration>2:22</itunes:duration>
       <itunes:explicit>no</itunes:explicit>
       <itunes:keywords>oil, gas, energy, industry, news, AI, podcast, drilling, OPEC, crude</itunes:keywords>
     </item>
